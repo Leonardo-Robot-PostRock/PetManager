@@ -8,7 +8,7 @@ public class Owner {
 	public Owner(String dni, String name, String street, String city) {
 		this.dni = dni;
 		this.name = name;
-		Address address = new Address(street, city);
+		this.address = new Address(street, city);
 	}
 
 	public String getDni() {
