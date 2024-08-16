@@ -6,6 +6,7 @@ public class Pet {
 	private double weight;
 	private String health;
 	private String race;
+	private Owner owner;
 
 	public Pet(String name, int age, double weight, String health, String race) {
 		this.name = name;
@@ -54,7 +55,13 @@ public class Pet {
 	public void setRace(String race) {
 		this.race = race;
 	}
-	
-	
+
+	public Owner getOwner() {
+		return owner;
+	}
+
+	public void setOwner(Owner owner) {
+		this.owner = owner;
+	}
 
 }
