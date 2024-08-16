@@ -8,6 +8,10 @@ public class Pet {
 	private String race;
 	private Owner owner;
 
+	public Pet(String name) {
+		this.name = name;
+	}
+
 	public Pet(String name, int age, double weight, String health, String race) {
 		this.name = name;
 		this.age = age;
