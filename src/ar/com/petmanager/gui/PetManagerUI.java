@@ -1,14 +1,13 @@
 package ar.com.petmanager.gui;
 
-import javax.swing.JFrame;
-
 import java.awt.Color;
 
 import javax.swing.*;
 import ar.com.petmanager.domain.*;
-import ar.com.petmanager.domain.Pet;
 
 public class PetManagerUI extends JFrame {
+
+	private static final long serialVersionUID = 1L;
 	private JTextField ownerNameField;
 	private JTextField petNameField;
 	private JButton addPetButton;
@@ -24,7 +23,7 @@ public class PetManagerUI extends JFrame {
 		setLocationRelativeTo(null);
 
 		getContentPane().setBackground(Color.BLUE);
-		ImageIcon image = new ImageIcon("src/ar/com/petmanager/assets/petIcon.png");
+		ImageIcon image = new ImageIcon("src/ar/com/petmanager/assets/icons/petIcon.png");
 		setIconImage(image.getImage());
 
 		JPanel panel = new JPanel();
