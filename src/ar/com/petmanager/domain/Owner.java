@@ -1,38 +1,7 @@
 package ar.com.petmanager.domain;
 
-public class Owner {
-	private String dni;
-	private String name;
-	private Address address;
-
-	public Owner(String dni, String name, String street, String city) {
-		this.dni = dni;
-		this.name = name;
-		this.address = new Address(street, city);
+public class Owner extends Person {
+	public Owner(String dni, String name, String surname, int phone) {
+		super(dni, name, surname, phone);
 	}
-
-	public String getDni() {
-		return dni;
-	}
-
-	public void setDni(String dni) {
-		this.dni = dni;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Address getAddress() {
-		return address;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-
 }
