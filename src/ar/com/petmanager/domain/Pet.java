@@ -1,23 +1,44 @@
 package ar.com.petmanager.domain;
 
 public class Pet {
+	private final long id;
 	private String name;
 	private int age;
 	private double weight;
-	private String health;
 	private String race;
-	private Owner owner;
+	private boolean isSick;
+	private String description;
+	private static int countPet;
 
+	private Pet() {
+		this.id = ++Pet.countPet;
+	}
+	
 	public Pet(String name) {
+		this();
 		this.name = name;
 	}
 
-	public Pet(String name, int age, double weight, String health, String race) {
+	public Pet(String name, int age, double weight, String race) {
+		this();
 		this.name = name;
 		this.age = age;
 		this.weight = weight;
-		this.health = health;
 		this.race = race;
+	}
+
+	public Pet(String name, int age, double weight, String race, boolean isSick, String description) {
+		this();
+		this.name = name;
+		this.age = age;
+		this.weight = weight;
+		this.race = race;
+		this.isSick = isSick;
+		this.description = description;
+	}
+
+	public long getId() {
+		return id;
 	}
 
 	public String getName() {
@@ -44,14 +65,6 @@ public class Pet {
 		this.weight = weight;
 	}
 
-	public String getHealth() {
-		return health;
-	}
-
-	public void setHealth(String health) {
-		this.health = health;
-	}
-
 	public String getRace() {
 		return race;
 	}
@@ -60,12 +73,20 @@ public class Pet {
 		this.race = race;
 	}
 
-	public Owner getOwner() {
-		return owner;
+	public boolean isSick() {
+		return isSick;
 	}
 
-	public void setOwner(Owner owner) {
-		this.owner = owner;
+	public void setSick(boolean isSick) {
+		this.isSick = isSick;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }
