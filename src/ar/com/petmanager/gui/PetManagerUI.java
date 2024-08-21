@@ -15,7 +15,7 @@ public class PetManagerUI extends JFrame {
 	private Owner owner;
 
 	public PetManagerUI() {
-		owner = new Owner("Leonardo", "Puebla", "Mendoza", "Portal");
+		owner = new Owner("Leonardo", "Puebla", "Mendoza", 261777777, "Pascua", "Queka");
 
 		setTitle("Pet Manager");
 		setSize(500, 500);
