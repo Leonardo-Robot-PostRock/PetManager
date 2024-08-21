@@ -5,7 +5,7 @@ import java.awt.Color;
 import javax.swing.*;
 import ar.com.petmanager.domain.*;
 
-public class PetManagerUI extends JFrame {
+public class AddPersonUI extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField ownerNameField;
@@ -14,7 +14,7 @@ public class PetManagerUI extends JFrame {
 
 	private Owner owner;
 
-	public PetManagerUI() {
+	public AddPersonUI() {
 		owner = new Owner("Leonardo", "Puebla", "Mendoza", 261777777, "Pascua", "Queka");
 
 		setTitle("Pet Manager");
@@ -42,8 +42,8 @@ public class PetManagerUI extends JFrame {
 		addPetButton.addActionListener(e -> {
 			String petName = petNameField.getText();
 			Pet pet = new Pet(petName);
-			pet.setOwner(owner);
-
+			//TODO: add owner.
+				
 			JOptionPane.showMessageDialog(this, "Pet " + petName + " added to " + owner.getName());
 		});
 
