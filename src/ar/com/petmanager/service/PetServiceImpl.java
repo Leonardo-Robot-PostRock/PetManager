@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import ar.com.petmanager.domain.*;
 
-public class AdoptableServiceImpl implements AdoptableService {
+public class PetServiceImpl implements PetService {
 	private List<Pet> availablePets;
 
-	public AdoptableServiceImpl() {
+	public PetServiceImpl() {
 		this.availablePets = new ArrayList<>();
 	}
 
