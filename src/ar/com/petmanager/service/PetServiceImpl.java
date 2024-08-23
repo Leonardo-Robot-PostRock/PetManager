@@ -13,11 +13,13 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public void adopPet(Owner owner, Pet pet) {
+    public void addOwner(Owner owner, Pet pet) {
+        
         if (owner == null || owner.getDni() <= 0) return;
+
         if(!availablePets.contains(pet)) return;
 
-        owner.addPet(pet);
+        owner.adoptPet(pet);
         availablePets.remove(pet);
     }
 
