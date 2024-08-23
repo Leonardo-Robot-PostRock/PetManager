@@ -1,13 +1,13 @@
 package ar.com.petmanager.domain;
 
-public class Person {
-	private String dni;
+public abstract class Person {
+	private int dni;
 	private String name;
 	private String surname;
 	private int phone;
 	private Address address;
 
-	public Person(String dni, String name, String surname, int phone, String street, String city) {
+	public Person(int dni, String name, String surname, int phone, String street, String city) {
 		this.dni = dni;
 		this.name = name;
 		this.surname = surname;
@@ -15,11 +15,11 @@ public class Person {
 		this.address = new Address(street, city);
 	}
 
-	public String getDni() {
+	public int getDni() {
 		return dni;
 	}
 
-	public void setDni(String dni) {
+	public void setDni(int dni) {
 		this.dni = dni;
 	}
 
