@@ -13,7 +13,7 @@ public class OwnerServiceImpl implements OwnerService {
     private List<Owner> owners;
 
     public OwnerServiceImpl() {
-        owners = new ArrayList<>();
+        owners = new ArrayList<Owner>();
     }
 
     @Override
@@ -51,13 +51,17 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public void update(Owner owner) {
-        Optional<Owner> optionalOwner = owners.stream().filter(existingOwner-> existingOwner.getDni() == owner.getDni()).findFirst();
+        Optional<Owner> optionalOwner = owners.stream().filter(existingOwner -> existingOwner.getDni() == owner.getDni()).findFirst();
 
-        if(optionalOwner.isPresent()){
+        if (optionalOwner.isPresent()) {
             Owner foundOwner = optionalOwner.get();
 
+            foundOwner.setDni(owner.getDni());
+            foundOwner.setName(owner.getName());
+            foundOwner.setSurname(owner.getSurname());
             foundOwner.setPhone(owner.getPhone());
             foundOwner.setAddress(owner.getAddress());
+            foundOwner.setPreferredVet(owner.getPreferredVet());
         }
     }
 }
