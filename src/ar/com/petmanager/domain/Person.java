@@ -55,4 +55,15 @@ public abstract class Person {
 		this.address = address;
 	}
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("Person{");
+		sb.append("dni=").append(dni);
+		sb.append(", name='").append(name).append('\'');
+		sb.append(", surname='").append(surname).append('\'');
+		sb.append(", phone=").append(phone);
+		sb.append(", address=").append(address);
+		sb.append('}');
+		return sb.toString();
+	}
 }
