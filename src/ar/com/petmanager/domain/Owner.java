@@ -11,12 +11,15 @@ public class Owner extends Person {
         super(dni, name, surname, phone, street, city);
     }
 
-    public Vet getPreferredVet() {
-        return preferredVet;
+    public Vet getPreferredVet() {        return preferredVet;
     }
 
     public void setPreferredVet(Vet preferredVet) {
         this.preferredVet = preferredVet;
+    }
+
+    public void removePreferredVet(){
+        this.preferredVet = null;
     }
 
     public void adoptPet(Pet pet) {
@@ -78,5 +81,10 @@ public class Owner extends Person {
     @Override
     public void setAddress(Address address) {
         super.setAddress(address);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }
