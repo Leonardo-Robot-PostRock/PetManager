@@ -4,10 +4,10 @@ public abstract class Person {
 	private int dni;
 	private String name;
 	private String surname;
-	private int phone;
+	private long phone;
 	private Address address;
 
-	public Person(int dni, String name, String surname, int phone, String street, String city) {
+	public Person(int dni, String name, String surname, long phone, String street, String city) {
 		this.dni = dni;
 		this.name = name;
 		this.surname = surname;
@@ -39,11 +39,11 @@ public abstract class Person {
 		this.surname = surname;
 	}
 
-	public int getPhone() {
+	public long getPhone() {
 		return phone;
 	}
 
-	public void setPhone(int phone) {
+	public void setPhone(long phone) {
 		this.phone = phone;
 	}
 

@@ -11,14 +11,15 @@ public class Owner extends Person {
         super(dni, name, surname, phone, street, city);
     }
 
-    public Vet getPreferredVet() {        return preferredVet;
+    public Vet getPreferredVet() {
+        return preferredVet;
     }
 
     public void setPreferredVet(Vet preferredVet) {
         this.preferredVet = preferredVet;
     }
 
-    public void removePreferredVet(){
+    public void removePreferredVet() {
         this.preferredVet = null;
     }
 
@@ -64,12 +65,12 @@ public class Owner extends Person {
     }
 
     @Override
-    public int getPhone() {
+    public long getPhone() {
         return super.getPhone();
     }
 
     @Override
-    public void setPhone(int phone) {
+    public void setPhone(long phone) {
         super.setPhone(phone);
     }
 

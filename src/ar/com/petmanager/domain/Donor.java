@@ -2,7 +2,7 @@ package ar.com.petmanager.domain;
 
 public class Donor extends Person {
 
-	public Donor(int dni, String name, String surname, int phone, String street, String city) {
+	public Donor(int dni, String name, String surname, long phone, String street, String city) {
 		super(dni, name, surname, phone, street, city);
 	}
 
@@ -37,12 +37,12 @@ public class Donor extends Person {
 	}
 
 	@Override
-	public int getPhone() {
+	public long getPhone() {
 		return super.getPhone();
 	}
 
 	@Override
-	public void setPhone(int phone) {
+	public void setPhone(long phone) {
 		super.setPhone(phone);
 	}
 
