@@ -1,0 +1,151 @@
+package ar.com.petmanager.gui.ownerUI;
+
+import ar.com.petmanager.domain.Owner;
+import ar.com.petmanager.domain.Vet;
+import ar.com.petmanager.service.OwnerServiceImpl;
+import ar.com.petmanager.service.VetServiceImpl;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class EditOwnerFormPanel extends JPanel {
+    private JTextField txtDni;
+    private JTextField txtName;
+    private JTextField txtSurname;
+    private JTextField txtPhone;
+    private JTextField txtStreet;
+    private JTextField txtCity;
+    private JComboBox<Vet> selectPreferredVet;
+    private JButton btnSave;
+
+    private OwnerServiceImpl ownerService;
+    private VetServiceImpl vetService;
+    private Owner currentOwner;
+
+    public EditOwnerFormPanel(OwnerServiceImpl ownerService, VetServiceImpl vetService) {
+        this.ownerService = ownerService;
+        this.vetService = vetService;
+        initializeComponents();
+        populateVets();
+    }
+
+    private void initializeComponents() {
+        setLayout(new GridBagLayout());
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        add(new JLabel("DNI:"), gridBagConstraints);
+        txtDni = new JTextField(15);
+        gridBagConstraints.gridx = 1;
+        add(txtDni, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        add(new JLabel("Nombre:"), gridBagConstraints);
+        txtName = new JTextField(15);
+        gridBagConstraints.gridx = 1;
+        add(txtName, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        add(new JLabel("Apellido:"), gridBagConstraints);
+        txtSurname = new JTextField(15);
+        gridBagConstraints.gridx = 1;
+        add(txtSurname, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        add(new JLabel("Teléfono:"), gridBagConstraints);
+        txtPhone = new JTextField(15);
+        gridBagConstraints.gridx = 1;
+        add(txtPhone, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        add(new JLabel("Calle:"), gridBagConstraints);
+        txtStreet = new JTextField(15);
+        gridBagConstraints.gridx = 1;
+        add(txtStreet, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        add(new JLabel("Ciudad:"), gridBagConstraints);
+        txtCity = new JTextField(15);
+        gridBagConstraints.gridx = 1;
+        add(txtCity, gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        add(new JLabel("Veterinario Preferido:"), gridBagConstraints);
+        selectPreferredVet = new JComboBox<>();
+        selectPreferredVet.setPreferredSize(new Dimension(170, 20));
+        gridBagConstraints.gridx = 1;
+        add(selectPreferredVet, gridBagConstraints);
+
+        btnSave = new JButton("Guardar");
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
+        add(btnSave, gridBagConstraints);
+        btnSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveOwner();
+            }
+        });
+    }
+
+    private void populateVets() {
+        for (Vet vet : vetService.getAll()) {
+            selectPreferredVet.addItem(vet);
+        }
+    }
+
+    private void saveOwner() {
+        try {
+            int dni = Integer.parseInt(txtDni.getText());
+            String name = txtName.getText();
+            String surname = txtSurname.getText();
+            int phone = Integer.parseInt(txtPhone.getText());
+            String street = txtStreet.getText();
+            String city = txtCity.getText();
+
+            Owner owner = new Owner(dni, name, surname, phone, street, city);
+            Vet preferredVet = (Vet) selectPreferredVet.getSelectedItem();
+
+            if (preferredVet != null) {
+                owner.setPreferredVet(preferredVet);
+            }
+
+            if (currentOwner != null) {
+                ownerService.update(owner);
+            } else {
+                ownerService.add(owner);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Error: DNI y teléfono deben ser números.");
+        }
+    }
+
+    public void setOwner(Owner owner) {
+        this.currentOwner = owner;
+        if (owner != null) {
+            txtDni.setText(String.valueOf(owner.getDni()));
+            txtName.setText(owner.getName());
+            txtSurname.setText(owner.getSurname());
+            txtPhone.setText(String.valueOf(owner.getPhone()));
+            txtStreet.setText(owner.getAddress().getStreet());
+            txtCity.setText(owner.getAddress().getCity());
+
+            if (owner.getPreferredVet() != null) {
+                selectPreferredVet.setSelectedItem(owner.getPreferredVet());
+            }
+        }
+    }
+}
