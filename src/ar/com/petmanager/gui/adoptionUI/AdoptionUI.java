@@ -1,27 +1,23 @@
-package ar.com.petmanager.gui;
+package ar.com.petmanager.gui.adoptionUI;
 
 import javax.swing.*;
 
-public class AdoptionUI extends JFrame {
+public class AdoptionUI extends JPanel {
 
     public AdoptionUI() {
-        // Configuración del JFrame
-        setTitle("Hola Mundo en Swing"); // Título de la ventana
-        setSize(300, 200); // Tamaño de la ventana
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Cierra la aplicación al cerrar la ventana
-        setLocationRelativeTo(null); // Centra la ventana en la pantalla
+        JFrame frame = new JFrame();
+        frame.setTitle("Hola Mundo en Swing");
+        frame.setSize(300, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
 
-        // Crear un JLabel con el texto "Hola Mundo"
         JLabel label = new JLabel("Hola Mundo", SwingConstants.CENTER);
 
-        // Agregar el JLabel al JFrame
         add(label);
     }
 
     public static void main(String[] args) {
-        // Ejecutar el código en el hilo de eventos de Swing
         SwingUtilities.invokeLater(() -> {
-            // Crear una instancia de AdoptionUI y hacerla visible
             AdoptionUI frame = new AdoptionUI();
             frame.setVisible(true);
         });
