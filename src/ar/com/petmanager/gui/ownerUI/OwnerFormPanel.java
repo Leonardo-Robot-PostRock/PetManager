@@ -6,10 +6,7 @@ import ar.com.petmanager.service.OwnerServiceImpl;
 import ar.com.petmanager.service.VetServiceImpl;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class OwnerFormPanel extends OwnerPanelBase {
     private final OwnerServiceImpl ownerService;
