@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public class VetServiceImpl implements VetService {
     List<Vet> availableVets;
-    private OwnerService ownerService;
+    private final OwnerService ownerService;
 
     public VetServiceImpl(OwnerService ownerService) {
         this.availableVets = new ArrayList<Vet>();
@@ -22,17 +22,19 @@ public class VetServiceImpl implements VetService {
     }
 
     @Override
-    public void delete(Vet vet) {
-        this.availableVets.remove(vet);
+    public void deleteById(int dni) {
+        Vet vet = this.getById(dni);
 
-        List<Owner> owners = this.ownerService.getAll();
+        if (vet != null) {
+            this.availableVets.remove(vet);
+            List<Owner> owners = this.ownerService.getAll();
 
-        for (Owner owner : owners) {
-            if (owner.getPreferredVet() != null && owner.getPreferredVet().equals(vet)) {
-                owner.removePreferredVet();
+            for (Owner owner : owners) {
+                if (owner.getPreferredVet() != null && owner.getPreferredVet().equals(vet)) {
+                    owner.removePreferredVet();
+                }
             }
         }
-
     }
 
     @Override
