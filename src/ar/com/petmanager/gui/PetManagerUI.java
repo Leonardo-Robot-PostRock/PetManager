@@ -9,16 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PetManagerUI extends JFrame {
-    private JPanel contentPanel;
-    private JButton btnHome;
-    private JButton btnAdoption;
-    private JButton btnViewPets;
-    private JButton btnOwner;
-    private JPanel sidebar;
-    private JButton btnContactDonors;
-    private JButton btnSearchVets;
-    private OwnerServiceImpl ownerService;
-    private VetServiceImpl vetService;
+    private final JPanel contentPanel;
 
     public PetManagerUI() {
         setTitle("Pet Manager");
@@ -26,18 +17,18 @@ public class PetManagerUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        sidebar = new JPanel();
+        JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
         sidebar.setBorder(BorderFactory.createEmptyBorder(10, 50, 10, 50));
 
         Dimension buttonSize = new Dimension(400, 200);
 
-        btnHome = new JButton("Inicio");
-        btnAdoption = new JButton("Adoptar");
-        btnContactDonors = new JButton("Contactar Donantes");
-        btnViewPets = new JButton("Ver mascotas");
-        btnOwner = new JButton("Dueños");
-        btnSearchVets = new JButton("Buscar Veterinarias");
+        JButton btnHome = new JButton("Inicio");
+        JButton btnAdoption = new JButton("Adoptar");
+        JButton btnContactDonors = new JButton("Contactar Donantes");
+        JButton btnViewPets = new JButton("Ver mascotas");
+        JButton btnOwner = new JButton("Dueños");
+        JButton btnSearchVets = new JButton("Buscar Veterinarias");
 
         btnHome.setMaximumSize(buttonSize);
         btnAdoption.setMaximumSize(buttonSize);
@@ -70,8 +61,8 @@ public class PetManagerUI extends JFrame {
         contentPanel = new JPanel();
         contentPanel.setLayout(new CardLayout());
 
-        this.ownerService = new OwnerServiceImpl();
-        this.vetService = new VetServiceImpl(ownerService);
+        OwnerServiceImpl ownerService = new OwnerServiceImpl();
+        VetServiceImpl vetService = new VetServiceImpl(ownerService);
 
         JPanel ownerPanel = new OwnerUI(ownerService, vetService);
         JPanel adoptionPanel = new AdoptionUI();
