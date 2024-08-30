@@ -1,7 +1,7 @@
-package ar.com.petmanager.gui;
+package ar.com.petmanager.gui.petUI;
 
 import javax.swing.*;
 
-public class AddPetUI extends JFrame {
+public class PetUI extends JFrame {
 
 }
