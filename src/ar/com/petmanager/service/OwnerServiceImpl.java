@@ -4,13 +4,14 @@ import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.domain.Vet;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class OwnerServiceImpl implements OwnerService {
 
-    private List<Owner> owners;
+    private final List<Owner> owners;
 
     public OwnerServiceImpl() {
         owners = new ArrayList<Owner>();
@@ -28,20 +29,28 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public void add(Owner owner) {
-        owners.add(owner);
+        Optional<Owner> optionalOwner = this.owners.stream().filter(existingOwner -> owner.getDni() == existingOwner.getDni()).findFirst();
+
+        if (optionalOwner.isPresent()) {
+            JOptionPane.showMessageDialog(null, "El DNI ya está registrado");
+        } else {
+            owners.add(owner);
+            JOptionPane.showMessageDialog(null, "Dueño agregado exitosamente.");
+        }
+
     }
 
     @Override
-    public void delete(Owner owner) {
-        owners.remove(owner);
+    public void deleteById(int dni) {
+        Owner ownerToDelete = getById(dni);
+        if (ownerToDelete != null) {
+            owners.remove(ownerToDelete);
+        }
     }
 
     @Override
     public Owner getById(int dni) {
-        return owners.stream()
-                .filter(existingOwner -> existingOwner.getDni() == dni)
-                .findFirst()
-                .orElse(null);
+        return owners.stream().filter(existingOwner -> existingOwner.getDni() == dni).findFirst().orElse(null);
     }
 
     @Override
