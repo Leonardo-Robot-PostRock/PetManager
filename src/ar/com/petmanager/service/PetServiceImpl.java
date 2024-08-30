@@ -7,7 +7,7 @@ import java.util.Optional;
 import ar.com.petmanager.domain.*;
 
 public class PetServiceImpl implements PetService {
-    private List<Pet> availablePets;
+    private final List<Pet> availablePets;
 
     public PetServiceImpl() {
         this.availablePets = new ArrayList<Pet>();
@@ -35,8 +35,11 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public void delete(Pet pet) {
-        availablePets.remove(pet);
+    public void deleteById(int id) {
+        Pet petToDelete = getById(id);
+        if (petToDelete != null) {
+            availablePets.remove(petToDelete);
+        }
     }
 
     @Override
