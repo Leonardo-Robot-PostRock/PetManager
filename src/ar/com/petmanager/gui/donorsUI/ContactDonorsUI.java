@@ -1,4 +1,4 @@
-package ar.com.petmanager.gui;
+package ar.com.petmanager.gui.donorsUI;
 
 public class ContactDonorsUI {
 
