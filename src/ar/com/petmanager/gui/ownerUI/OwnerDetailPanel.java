@@ -1,132 +1,67 @@
 package ar.com.petmanager.gui.ownerUI;
 
 import ar.com.petmanager.domain.Owner;
+import ar.com.petmanager.domain.Vet;
 import ar.com.petmanager.service.OwnerServiceImpl;
+import ar.com.petmanager.service.VetServiceImpl;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class OwnerDetailPanel extends JPanel {
-    private JTextField txtDni, txtName, txtSurname, txtPhone, txtStreet, txtCity;
-    private JButton btnEdit, btnSave, btnCancel, btnDelete, btnBack;
-    private OwnerServiceImpl ownerService;
+public class OwnerDetailPanel extends OwnerPanelBase {
+    private final OwnerServiceImpl ownerService;
     private Owner currentOwner;
     private OwnerUI ownerUI;
+    private JButton btnEdit, btnSave, btnCancel, btnDelete;
 
-    public OwnerDetailPanel(OwnerServiceImpl ownerService) {
+    public OwnerDetailPanel(OwnerServiceImpl ownerService, VetServiceImpl vetService) {
+        super(vetService);
         this.ownerService = ownerService;
 
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
+        setPanelTitle("Detalle del Dueño y edición");
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(new JLabel("DNI:"), gbc);
-        txtDni = new JTextField(15);
-        txtDni.setEditable(false);
-        gbc.gridx = 1;
-        add(txtDni, gbc);
+        initializeButtons();
+        arrangeButtonPanel();
+        setFieldsEditable(false);
+        btnSave.setEnabled(false);
+        btnCancel.setEnabled(false);
+        loadVets();
+    }
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        add(new JLabel("Nombre:"), gbc);
-        txtName = new JTextField(15);
-        gbc.gridx = 1;
-        add(txtName, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        add(new JLabel("Apellido:"), gbc);
-        txtSurname = new JTextField(15);
-        gbc.gridx = 1;
-        add(txtSurname, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        add(new JLabel("Teléfono:"), gbc);
-        txtPhone = new JTextField(15);
-        gbc.gridx = 1;
-        add(txtPhone, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        add(new JLabel("Calle:"), gbc);
-        txtStreet = new JTextField(15);
-        gbc.gridx = 1;
-        add(txtStreet, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        add(new JLabel("Ciudad:"), gbc);
-        txtCity = new JTextField(15);
-        gbc.gridx = 1;
-        add(txtCity, gbc);
-
+    private void initializeButtons() {
         btnEdit = new JButton("Editar");
         btnSave = new JButton("Guardar");
         btnCancel = new JButton("Cancelar");
         btnDelete = new JButton("Eliminar");
-        btnBack = new JButton("Volver");
 
-        gbc.gridx = 0;
-        gbc.gridy = 6;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        JPanel buttonPanel = new JPanel();
+        btnEdit.addActionListener(e -> {
+            setFieldsEditable(true);
+            btnSave.setEnabled(true);
+            btnCancel.setEnabled(true);
+            btnEdit.setEnabled(false);
+            btnDelete.setEnabled(false);
+        });
+
+        btnSave.addActionListener(e -> saveOwner());
+
+        btnCancel.addActionListener(e -> cancelEdit());
+
+        btnDelete.addActionListener(e -> deleteOwner());
+    }
+
+    private void arrangeButtonPanel() {
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(btnEdit);
         buttonPanel.add(btnSave);
         buttonPanel.add(btnCancel);
         buttonPanel.add(btnDelete);
-        buttonPanel.add(btnBack);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 10;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
         add(buttonPanel, gbc);
-
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setFieldsEditable(true);
-                btnSave.setEnabled(true);
-                btnCancel.setEnabled(true);
-                btnEdit.setEnabled(false);
-                btnDelete.setEnabled(false);
-            }
-        });
-
-        btnSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveOwner();
-            }
-        });
-
-        btnCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cancelEdit();
-            }
-        });
-
-        btnDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteOwner();
-            }
-        });
-
-        btnBack.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showOwnerList();
-            }
-        });
-
-        setFieldsEditable(false);
-        btnSave.setEnabled(false);
-        btnCancel.setEnabled(false);
-        btnDelete.setEnabled(true);
     }
 
     public void setOwner(Owner owner) {
@@ -138,6 +73,7 @@ public class OwnerDetailPanel extends JPanel {
             txtPhone.setText(String.valueOf(owner.getPhone()));
             txtStreet.setText(owner.getAddress().getStreet());
             txtCity.setText(owner.getAddress().getCity());
+            selectPreferredVet.setSelectedItem(owner.getPreferredVet());
         }
     }
 
@@ -147,6 +83,7 @@ public class OwnerDetailPanel extends JPanel {
         txtPhone.setEditable(editable);
         txtStreet.setEditable(editable);
         txtCity.setEditable(editable);
+        selectPreferredVet.setEnabled(editable);
     }
 
     private void saveOwner() {
@@ -158,6 +95,9 @@ public class OwnerDetailPanel extends JPanel {
                 currentOwner.getAddress().setStreet(txtStreet.getText());
                 currentOwner.getAddress().setCity(txtCity.getText());
 
+                Vet selectedVet = (Vet) selectPreferredVet.getSelectedItem();
+                currentOwner.setPreferredVet(selectedVet);
+
                 ownerService.update(currentOwner);
                 JOptionPane.showMessageDialog(this, "Dueño actualizado exitosamente.");
                 setFieldsEditable(false);
@@ -165,6 +105,7 @@ public class OwnerDetailPanel extends JPanel {
                 btnCancel.setEnabled(false);
                 btnEdit.setEnabled(true);
                 btnDelete.setEnabled(true);
+                showOwnerList();
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Error: Teléfono debe ser un número.");
             }
@@ -191,7 +132,10 @@ public class OwnerDetailPanel extends JPanel {
     }
 
     private void showOwnerList() {
-        // Implement this method to switch back to the owner list or main panel
+        if (ownerUI != null) {
+            ownerUI.updateTableData();
+            ownerUI.showOwnerList();
+        }
     }
 
     public void setOwnerUI(OwnerUI ownerUI) {
