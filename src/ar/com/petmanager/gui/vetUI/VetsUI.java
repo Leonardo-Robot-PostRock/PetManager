@@ -1,5 +1,5 @@
-package ar.com.petmanager.gui;
+package ar.com.petmanager.gui.vetUI;
 
-public class SearchVetsUI {
+public class VetsUI {
 
 }
