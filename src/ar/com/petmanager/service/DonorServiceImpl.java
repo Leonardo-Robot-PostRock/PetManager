@@ -19,8 +19,11 @@ public class DonorServiceImpl implements DonorService {
     }
 
     @Override
-    public void delete(Donor donor) {
-        this.availableDonors.remove(donor);
+    public void deleteById(int dni) {
+        Donor donorToDelete = getById(dni);
+        if (donorToDelete != null) {
+            this.availableDonors.remove(donorToDelete);
+        }
     }
 
     @Override
