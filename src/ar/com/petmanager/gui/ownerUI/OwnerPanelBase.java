@@ -6,7 +6,6 @@ import ar.com.petmanager.service.VetServiceImpl;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.util.List;
 
