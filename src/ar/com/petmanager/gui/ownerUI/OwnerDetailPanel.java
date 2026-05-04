@@ -1,144 +1,221 @@
 package ar.com.petmanager.gui.ownerUI;
 
+import ar.com.petmanager.domain.Dog;
 import ar.com.petmanager.domain.Owner;
-import ar.com.petmanager.domain.Vet;
-import ar.com.petmanager.service.OwnerServiceImpl;
-import ar.com.petmanager.service.VetServiceImpl;
+import ar.com.petmanager.domain.Pet;
+import ar.com.petmanager.gui.base.BasePanel;
+import ar.com.petmanager.gui.constants.UIConstants;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.List;
 
-public class OwnerDetailPanel extends OwnerPanelBase {
-    private final OwnerServiceImpl ownerService;
+/**
+ * Panel de detalle de dueño.
+ * Muestra avatar, info completa, y resumen de mascotas.
+ */
+public class OwnerDetailPanel extends BasePanel {
+
     private Owner currentOwner;
-    private OwnerUI ownerUI;
-    private JButton btnEdit, btnSave, btnCancel, btnDelete;
 
-    public OwnerDetailPanel(OwnerServiceImpl ownerService, VetServiceImpl vetService) {
-        super(vetService);
-        this.ownerService = ownerService;
+    private JLabel lblName;
+    private JLabel lblDni;
+    private JLabel lblPhone;
+    private JLabel lblAddress;
+    private JLabel lblSex;
+    private JLabel lblVet;
+    private JLabel lblPetCount;
+    private JLabel lblPetTypes;
+    private JTextArea txtPetNames;
 
-        setPanelTitle("Detalle del Dueño y edición");
+    private JPanel avatarPanel;
+    private JButton btnBack;
 
-        initializeButtons();
-        arrangeButtonPanel();
-        setFieldsEditable(false);
-        btnSave.setEnabled(false);
-        btnCancel.setEnabled(false);
-        loadVets();
+    private final Runnable onBackToList;
+
+    public OwnerDetailPanel(Runnable onBack) {
+        this.onBackToList = onBack;
+
+        initializeComponents();
+        configureLayout();
+        configureListeners();
     }
 
-    private void initializeButtons() {
-        btnEdit = new JButton("Editar");
-        btnSave = new JButton("Guardar");
-        btnCancel = new JButton("Cancelar");
-        btnDelete = new JButton("Eliminar");
+    private void initializeComponents() {
+        lblName = new JLabel();
+        lblDni = new JLabel();
+        lblPhone = new JLabel();
+        lblAddress = new JLabel();
+        lblSex = new JLabel();
+        lblVet = new JLabel();
+        lblPetCount = new JLabel();
+        lblPetTypes = new JLabel();
 
-        btnEdit.addActionListener(e -> {
-            setFieldsEditable(true);
-            btnSave.setEnabled(true);
-            btnCancel.setEnabled(true);
-            btnEdit.setEnabled(false);
-            btnDelete.setEnabled(false);
-        });
+        txtPetNames = new JTextArea();
+        txtPetNames.setEditable(false);
+        txtPetNames.setFont(UIConstants.FONT_BODY);
+        txtPetNames.setLineWrap(true);
+        txtPetNames.setWrapStyleWord(true);
+        txtPetNames.setBackground(UIConstants.COLOR_WHITE);
 
-        btnSave.addActionListener(e -> saveOwner());
+        avatarPanel = new JPanel();
+        avatarPanel.setPreferredSize(new Dimension(150, 150));
+        avatarPanel.setOpaque(false);
 
-        btnCancel.addActionListener(e -> cancelEdit());
-
-        btnDelete.addActionListener(e -> deleteOwner());
+        btnBack = createButton("← Volver", UIConstants.COLOR_TEXT_SECONDARY);
     }
 
-    private void arrangeButtonPanel() {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(btnEdit);
-        buttonPanel.add(btnSave);
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(btnDelete);
+    private void configureLayout() {
+        setLayout(new BorderLayout());
+        setBorder(new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
+                UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 10;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        add(buttonPanel, gbc);
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.setOpaque(false);
+        topPanel.add(btnBack);
+
+        JPanel centerPanel = new JPanel(new BorderLayout(UIConstants.PADDING_LARGE, 0));
+        centerPanel.setOpaque(false);
+
+        centerPanel.add(createAvatarSection(), BorderLayout.WEST);
+        centerPanel.add(createInfoSection(), BorderLayout.CENTER);
+
+        add(topPanel, BorderLayout.NORTH);
+        add(centerPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel createAvatarSection() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(new EmptyBorder(0, 0, 0, UIConstants.PADDING_LARGE));
+        panel.add(avatarPanel, BorderLayout.NORTH);
+        return panel;
+    }
+
+    private JPanel createInfoSection() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
+                new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
+                        UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE)
+        ));
+
+        lblName.setFont(UIConstants.FONT_TITLE);
+        lblName.setForeground(UIConstants.COLOR_CARD_OWNER);
+
+        panel.add(lblName);
+        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
+        panel.add(createInfoRow("DNI:", lblDni));
+        panel.add(createInfoRow("Teléfono:", lblPhone));
+        panel.add(createInfoRow("Dirección:", lblAddress));
+        panel.add(createInfoRow("Sexo:", lblSex));
+        panel.add(createInfoRow("Vet. Preferida:", lblVet));
+        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
+
+        // Sección mascotas
+        JLabel lblPets = new JLabel("Mascotas");
+        lblPets.setFont(UIConstants.FONT_BODY_BOLD);
+        lblPets.setForeground(UIConstants.COLOR_CARD_PETS);
+        panel.add(lblPets);
+        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
+        panel.add(createInfoRow("Cantidad:", lblPetCount));
+        panel.add(createInfoRow("Tipos:", lblPetTypes));
+
+        JLabel lblNames = new JLabel("Nombres:");
+        lblNames.setFont(UIConstants.FONT_BODY_BOLD);
+        lblNames.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+
+        JScrollPane scrollNames = new JScrollPane(txtPetNames);
+        scrollNames.setPreferredSize(new Dimension(300, 60));
+        scrollNames.setBorder(new LineBorder(UIConstants.COLOR_BORDER, 1));
+
+        panel.add(lblNames);
+        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
+        panel.add(scrollNames);
+
+        return panel;
+    }
+
+    private JPanel createInfoRow(String label, JLabel value) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
+        row.setOpaque(false);
+
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(UIConstants.FONT_BODY_BOLD);
+        lbl.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        lbl.setPreferredSize(new Dimension(110, 25));
+
+        value.setFont(UIConstants.FONT_BODY);
+        value.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+
+        row.add(lbl);
+        row.add(value);
+        return row;
     }
 
     public void setOwner(Owner owner) {
         this.currentOwner = owner;
-        if (owner != null) {
-            txtDni.setText(String.valueOf(owner.getDni()));
-            txtName.setText(owner.getName());
-            txtSurname.setText(owner.getSurname());
-            txtPhone.setText(String.valueOf(owner.getPhone()));
-            txtStreet.setText(owner.getAddress().getStreet());
-            txtCity.setText(owner.getAddress().getCity());
-            selectPreferredVet.setSelectedItem(owner.getPreferredVet());
-        }
-    }
 
-    private void setFieldsEditable(boolean editable) {
-        txtName.setEditable(editable);
-        txtSurname.setEditable(editable);
-        txtPhone.setEditable(editable);
-        txtStreet.setEditable(editable);
-        txtCity.setEditable(editable);
-        selectPreferredVet.setEnabled(editable);
-    }
+        lblName.setText(owner.getName() + " " + owner.getSurname());
+        lblDni.setText(String.valueOf(owner.getDni()));
+        lblPhone.setText(String.valueOf(owner.getPhone()));
+        lblAddress.setText(owner.getAddress().getStreet() + ", " + owner.getAddress().getCity());
+        lblSex.setText(owner.getSex() != null ? owner.getSex().name() : "—");
+        lblVet.setText(owner.getPreferredVet() != null
+                ? owner.getPreferredVet().getName() + " — " + owner.getPreferredVet().getAddress().getCity()
+                : "Sin asignar");
 
-    private void saveOwner() {
-        if (currentOwner != null) {
-            try {
-                currentOwner.setName(txtName.getText());
-                currentOwner.setSurname(txtSurname.getText());
-                currentOwner.setPhone(Integer.parseInt(txtPhone.getText()));
-                currentOwner.getAddress().setStreet(txtStreet.getText());
-                currentOwner.getAddress().setCity(txtCity.getText());
+        // Mascotas
+        List<Pet> pets = owner.getPets();
+        if (pets == null || pets.isEmpty()) {
+            lblPetCount.setText("0");
+            lblPetTypes.setText("—");
+            txtPetNames.setText("No tiene mascotas.");
+        } else {
+            lblPetCount.setText(String.valueOf(pets.size()));
+            long dogs = pets.stream().filter(p -> p instanceof Dog).count();
+            long cats = pets.size() - dogs;
+            lblPetTypes.setText(dogs + " Perro" + (dogs != 1 ? "s" : "")
+                    + ", " + cats + " Gato" + (cats != 1 ? "s" : ""));
 
-                Vet selectedVet = (Vet) selectPreferredVet.getSelectedItem();
-                currentOwner.setPreferredVet(selectedVet);
-
-                ownerService.update(currentOwner);
-                JOptionPane.showMessageDialog(this, "Dueño actualizado exitosamente.");
-                setFieldsEditable(false);
-                btnSave.setEnabled(false);
-                btnCancel.setEnabled(false);
-                btnEdit.setEnabled(true);
-                btnDelete.setEnabled(true);
-                showOwnerList();
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Error: Teléfono debe ser un número.");
+            StringBuilder names = new StringBuilder();
+            for (Pet pet : pets) {
+                names.append("• ").append(pet.getName())
+                        .append(" (").append(pet instanceof Dog ? "Perro" : "Gato").append(")\n");
             }
+            txtPetNames.setText(names.toString().trim());
         }
+
+        updateAvatar(owner);
     }
 
-    private void cancelEdit() {
-        setFieldsEditable(false);
-        btnSave.setEnabled(false);
-        btnCancel.setEnabled(false);
-        btnEdit.setEnabled(true);
-        btnDelete.setEnabled(true);
+    private void updateAvatar(Owner owner) {
+        avatarPanel.removeAll();
+        String initials = owner.getName().substring(0, 1) + owner.getSurname().substring(0, 1);
+        avatarPanel.add(ar.com.petmanager.gui.utils.ImageUtils.createAvatarPlaceholder(
+                initials, 140, UIConstants.COLOR_CARD_OWNER));
+        avatarPanel.revalidate();
+        avatarPanel.repaint();
     }
 
-    private void deleteOwner() {
-        if (currentOwner != null) {
-            int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de que quieres eliminar este dueño?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                ownerService.deleteById(currentOwner.getDni());
-                JOptionPane.showMessageDialog(this, "Dueño eliminado exitosamente.");
-                showOwnerList();
-            }
-        }
+    private void configureListeners() {
+        btnBack.addActionListener(e -> onBackToList.run());
     }
 
-    private void showOwnerList() {
-        if (ownerUI != null) {
-            ownerUI.updateTableData();
-            ownerUI.showOwnerList();
-        }
-    }
-
-    public void setOwnerUI(OwnerUI ownerUI) {
-        this.ownerUI = ownerUI;
+    private JButton createButton(String text, Color bgColor) {
+        JButton btn = new JButton(text);
+        btn.setFont(UIConstants.FONT_BODY_BOLD);
+        btn.setBackground(bgColor);
+        btn.setForeground(UIConstants.COLOR_WHITE);
+        btn.setBorder(new EmptyBorder(8, 18, 8, 18));
+        btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
     }
 }

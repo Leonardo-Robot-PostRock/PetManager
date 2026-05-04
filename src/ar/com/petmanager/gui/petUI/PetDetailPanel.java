@@ -3,6 +3,7 @@ package ar.com.petmanager.gui.petUI;
 import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.domain.PetStatus;
+import ar.com.petmanager.domain.Sex;
 import ar.com.petmanager.gui.base.BasePanel;
 import ar.com.petmanager.gui.constants.UIConstants;
 import ar.com.petmanager.service.OwnerService;
@@ -35,6 +36,7 @@ public class PetDetailPanel extends BasePanel {
     private JLabel lblStatus;
     private JComboBox<PetStatus> cmbStatus;
     private JTextArea txtDescription;
+    private JLabel lblOwners;
 
     private JPanel avatarPanel;
     private JButton btnEdit;
@@ -82,6 +84,10 @@ public class PetDetailPanel extends BasePanel {
         txtDescription.setLineWrap(true);
         txtDescription.setWrapStyleWord(true);
         txtDescription.setBackground(UIConstants.COLOR_WHITE);
+
+        lblOwners = new JLabel();
+        lblOwners.setFont(UIConstants.FONT_BODY);
+        lblOwners.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
 
         avatarPanel = new JPanel();
         avatarPanel.setPreferredSize(new Dimension(150, 150));
@@ -174,6 +180,13 @@ public class PetDetailPanel extends BasePanel {
         panel.add(lblDesc);
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
         panel.add(scrollDesc);
+        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
+
+        JLabel lblOwnerTitle = new JLabel("Dueños:");
+        lblOwnerTitle.setFont(UIConstants.FONT_BODY_BOLD);
+        lblOwnerTitle.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        panel.add(lblOwnerTitle);
+        panel.add(lblOwners);
 
         return panel;
     }
@@ -260,6 +273,20 @@ public class PetDetailPanel extends BasePanel {
         lblStatus.setText(pet.getStatus() != null ? pet.getStatus().getLabel() : "Activa");
         cmbStatus.setSelectedItem(pet.getStatus() != null ? pet.getStatus() : PetStatus.ACTIVA);
         txtDescription.setText(pet.getDescription());
+
+        // Dueños con prefijo según sexo
+        List<Owner> owners = pet.getOwners();
+        if (owners == null || owners.isEmpty()) {
+            lblOwners.setText("Sin dueño asignado.");
+        } else {
+            StringBuilder sb = new StringBuilder("<html>");
+            for (Owner o : owners) {
+                String prefix = o.getSex() == Sex.FEMENINO ? "Mamá" : "Papá";
+                sb.append(prefix).append(": ").append(o.getName()).append(" ").append(o.getSurname()).append("<br>");
+            }
+            sb.append("</html>");
+            lblOwners.setText(sb.toString());
+        }
 
         updateAvatar(pet);
         setEditMode(false);

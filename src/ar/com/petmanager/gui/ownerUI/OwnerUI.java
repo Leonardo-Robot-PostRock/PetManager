@@ -41,14 +41,23 @@ public class OwnerUI extends BasePanel {
     private JTable tblOwners;
     private DefaultTableModel tableModel;
 
+    // Navegación lista ↔ detalle
+    private final CardLayout cardLayout;
+    private final JPanel cards;
+    private final OwnerDetailPanel detailPanel;
+
     private JButton btnSave;
     private JButton btnUpdate;
     private JButton btnDelete;
     private JButton btnClear;
+    private JButton btnViewDetail;
 
     public OwnerUI(OwnerService ownerService, VetService vetService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
+        this.cardLayout = new CardLayout();
+        this.cards = new JPanel(cardLayout);
+        this.detailPanel = new OwnerDetailPanel(() -> cardLayout.show(cards, "lista"));
         initializeComponents();
         configureLayout();
         configureListeners();
@@ -69,6 +78,7 @@ public class OwnerUI extends BasePanel {
         btnUpdate = createButton("Actualizar", UIConstants.COLOR_ACCENT);
         btnDelete = createButton("Eliminar", UIConstants.COLOR_ERROR);
         btnClear = createButton("Limpiar", UIConstants.COLOR_TEXT_SECONDARY);
+        btnViewDetail = createButton("Ver Detalle", UIConstants.COLOR_CARD_PETS);
 
         tblOwners = new JTable();
         setupTable();
@@ -85,7 +95,11 @@ public class OwnerUI extends BasePanel {
         mainPanel.add(createFormPanel(), BorderLayout.NORTH);
         mainPanel.add(createTablePanel(), BorderLayout.CENTER);
 
-        add(mainPanel, BorderLayout.CENTER);
+        cards.setOpaque(false);
+        cards.add(mainPanel, "lista");
+        cards.add(detailPanel, "detalle");
+
+        add(cards, BorderLayout.CENTER);
     }
 
     private JPanel createFormPanel() {
@@ -185,14 +199,13 @@ public class OwnerUI extends BasePanel {
         JLabel lblTitle = new JLabel("Dueños Registrados");
         lblTitle.setFont(UIConstants.FONT_SUBTITLE);
         lblTitle.setForeground(UIConstants.COLOR_CARD_OWNER);
-        lblTitle.setBorder(new EmptyBorder(0, 0, UIConstants.PADDING_MEDIUM, 0));
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        headerPanel.add(lblTitle, BorderLayout.WEST);
+        headerPanel.add(btnViewDetail, BorderLayout.EAST);
+        headerPanel.setBorder(new EmptyBorder(0, 0, UIConstants.PADDING_MEDIUM, 0));
 
-        JScrollPane scrollPane = new JScrollPane(tblOwners);
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-
-        panel.add(lblTitle, BorderLayout.NORTH);
+        panel.add(headerPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         return panel;
@@ -231,6 +244,7 @@ public class OwnerUI extends BasePanel {
         btnUpdate.addActionListener(e -> updateOwner());
         btnDelete.addActionListener(e -> deleteOwner());
         btnClear.addActionListener(e -> clearForm());
+        btnViewDetail.addActionListener(e -> showOwnerDetail());
 
         tblOwners.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -328,6 +342,22 @@ public class OwnerUI extends BasePanel {
         loadTableData();
         clearForm();
         info("Dueño eliminado exitosamente.");
+    }
+
+    private void showOwnerDetail() {
+        int row = tblOwners.getSelectedRow();
+        if (row == -1) {
+            showError("Seleccioná un dueño de la tabla.");
+            return;
+        }
+        int dni = (int) tableModel.getValueAt(row, 0);
+        Owner owner = ownerService.getById(dni);
+        if (owner != null) {
+            detailPanel.setOwner(owner);
+            cardLayout.show(cards, "detalle");
+        } else {
+            showError("Dueño no encontrado.");
+        }
     }
 
     private void clearForm() {
