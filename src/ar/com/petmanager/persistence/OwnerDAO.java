@@ -2,6 +2,7 @@ package ar.com.petmanager.persistence;
 
 import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Pet;
+import ar.com.petmanager.domain.Vet;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,7 +21,7 @@ public class OwnerDAO implements DAO<Owner, Integer> {
 
     @Override
     public void create(Owner owner) {
-        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type) VALUES (?, ?, ?, ?, ?, ?, 'OWNER')";
+        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type, preferred_vet_id) VALUES (?, ?, ?, ?, ?, ?, 'OWNER', ?)";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, owner.getDni());
@@ -29,6 +30,11 @@ public class OwnerDAO implements DAO<Owner, Integer> {
             stmt.setLong(4, owner.getPhone());
             stmt.setString(5, owner.getAddress().getStreet());
             stmt.setString(6, owner.getAddress().getCity());
+            if (owner.getPreferredVet() != null) {
+                stmt.setLong(7, owner.getPreferredVet().getIdVet());
+            } else {
+                stmt.setNull(7, java.sql.Types.BIGINT);
+            }
             stmt.executeUpdate();
             savePets(conn, owner);
         } catch (SQLException e) {
@@ -38,7 +44,7 @@ public class OwnerDAO implements DAO<Owner, Integer> {
 
     @Override
     public void update(Owner owner) {
-        String sql = "UPDATE persons SET name = ?, surname = ?, phone = ?, street = ?, city = ? WHERE dni = ? AND type = 'OWNER'";
+        String sql = "UPDATE persons SET name = ?, surname = ?, phone = ?, street = ?, city = ?, preferred_vet_id = ? WHERE dni = ? AND type = 'OWNER'";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, owner.getName());
@@ -46,7 +52,12 @@ public class OwnerDAO implements DAO<Owner, Integer> {
             stmt.setLong(3, owner.getPhone());
             stmt.setString(4, owner.getAddress().getStreet());
             stmt.setString(5, owner.getAddress().getCity());
-            stmt.setInt(6, owner.getDni());
+            if (owner.getPreferredVet() != null) {
+                stmt.setLong(6, owner.getPreferredVet().getIdVet());
+            } else {
+                stmt.setNull(6, java.sql.Types.BIGINT);
+            }
+            stmt.setInt(7, owner.getDni());
             stmt.executeUpdate();
             updatePets(conn, owner);
         } catch (SQLException e) {
@@ -109,6 +120,11 @@ public class OwnerDAO implements DAO<Owner, Integer> {
         );
         owner.setPets(loadPetsForOwner(rs.getInt("dni")));
 
+        long vetId = rs.getLong("preferred_vet_id");
+        if (!rs.wasNull()) {
+            owner.setPreferredVet(loadVet(vetId));
+        }
+
         return owner;
     }
 
@@ -166,5 +182,27 @@ public class OwnerDAO implements DAO<Owner, Integer> {
             stmt.executeUpdate();
         }
         savePets(conn, owner);
+    }
+
+    private Vet loadVet(long vetId) {
+        String sql = "SELECT * FROM vets WHERE id_vet = ?";
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, vetId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Vet vet = new Vet(
+                        rs.getString("name"),
+                        rs.getInt("phone"),
+                        rs.getString("street"),
+                        rs.getString("city")
+                );
+                vet.setIdVet(rs.getLong("id_vet"));
+                return vet;
+            }
+        } catch (SQLException e) {
+            throw new PersistenceException("Error al cargar Vet preferida del Owner", e);
+        }
+        return null;
     }
 }
