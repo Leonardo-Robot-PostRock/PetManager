@@ -47,14 +47,13 @@ Esto crea la base `petmanager` con todas las tablas:
 - `owner_pet` — Relación muchos-a-muchos Owner↔Pet
 - `owner_vet` — Relación Owner↔Vet con flag `is_preferred`
 
-3. Configurá las credenciales en `resources/database.properties`:
+3. Configurá tus credenciales:
 
-```properties
-db.url=jdbc:mysql://localhost:3306/petmanager?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-db.user=root
-db.password=tu_password
-db.driver=com.mysql.cj.jdbc.Driver
+```bash
+cp resources/database.properties.example resources/database.properties
 ```
+
+Editá `resources/database.properties` con tu usuario y contraseña de MySQL.
 
 ## Compilar y ejecutar
 

@@ -7,6 +7,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Singleton que gestiona la conexión JDBC a MySQL.
+ * Lee credenciales desde database.properties en el classpath.
+ */
 public class DBConnector {
     private static DBConnector instance;
     private final String url;
@@ -21,13 +25,19 @@ public class DBConnector {
                 throw new PersistenceException("No se encontró database.properties en classpath");
             }
             props.load(input);
-            this.url = props.getProperty("db.url");
-            this.user = props.getProperty("db.user");
-            this.password = props.getProperty("db.password");
-            this.driver = props.getProperty("db.driver");
+        } catch (IOException e) {
+            throw new PersistenceException("Error al leer database.properties", e);
+        }
+
+        this.driver = props.getProperty("db.driver");
+        this.url = props.getProperty("db.url");
+        this.user = props.getProperty("db.user");
+        this.password = props.getProperty("db.password");
+
+        try {
             Class.forName(driver);
-        } catch (IOException | ClassNotFoundException e) {
-            throw new PersistenceException("Error al cargar configuración de base de datos", e);
+        } catch (ClassNotFoundException e) {
+            throw new PersistenceException("Driver MySQL no encontrado: " + driver, e);
         }
     }
 
