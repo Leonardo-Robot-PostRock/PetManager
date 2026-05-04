@@ -205,6 +205,10 @@ public class OwnerUI extends BasePanel {
         headerPanel.add(btnViewDetail, BorderLayout.EAST);
         headerPanel.setBorder(new EmptyBorder(0, 0, UIConstants.PADDING_MEDIUM, 0));
 
+        JScrollPane scrollPane = new JScrollPane(tblOwners);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+
         panel.add(headerPanel, BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
 

@@ -31,5 +31,6 @@ public interface DataAccess {
     List<Pet> getAllPets();
 
     void addPetToOwner(int ownerDni, long petId);
+    void removeAllOwnersFromPet(long petId);
     void addPreferredVetToOwner(int ownerDni, long vetId, boolean preferred);
 }

@@ -167,6 +167,13 @@ public class PetDetailPanel extends BasePanel {
         panel.add(createInfoRow("Raza:", lblRace));
         panel.add(createCheckRow("Salud:", chkSick));
         panel.add(createComboRow("Estatus:", cmbStatus));
+        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
+
+        JLabel lblOwnerTitle = new JLabel("Dueños:");
+        lblOwnerTitle.setFont(UIConstants.FONT_BODY_BOLD);
+        lblOwnerTitle.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        panel.add(lblOwnerTitle);
+        panel.add(lblOwners);
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
 
         JLabel lblDesc = new JLabel("Descripción:");
@@ -180,13 +187,6 @@ public class PetDetailPanel extends BasePanel {
         panel.add(lblDesc);
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
         panel.add(scrollDesc);
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
-
-        JLabel lblOwnerTitle = new JLabel("Dueños:");
-        lblOwnerTitle.setFont(UIConstants.FONT_BODY_BOLD);
-        lblOwnerTitle.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
-        panel.add(lblOwnerTitle);
-        panel.add(lblOwners);
 
         return panel;
     }
@@ -354,9 +354,15 @@ public class PetDetailPanel extends BasePanel {
 
         btnAdopt.addActionListener(e -> {
             if (currentPet == null) return;
-            JOptionPane.showMessageDialog(this,
-                    "Esta mascota será marcada como disponible para adopción.",
-                    "Dar en Adopción", JOptionPane.INFORMATION_MESSAGE);
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "¿Quitar todos los dueños y marcar esta mascota como disponible para adopción?",
+                    "Dar en Adopción", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                petService.removeAllOwnersFromPet(currentPet.getId());
+                currentPet.setOwners(new ArrayList<>());
+                lblOwners.setText("Sin dueño asignado.");
+                JOptionPane.showMessageDialog(this, "Mascota disponible para adopción.");
+            }
         });
 
         btnAddOwner.addActionListener(e -> {

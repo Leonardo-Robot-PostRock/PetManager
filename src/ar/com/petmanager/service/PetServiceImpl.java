@@ -84,6 +84,18 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
+    public void removeAllOwnersFromPet(long petId) {
+        if (dataAccess != null) {
+            dataAccess.removeAllOwnersFromPet(petId);
+        }
+        // Limpiar dueños del objeto en memoria si está cacheado
+        Pet pet = getById((int) petId);
+        if (pet != null) {
+            pet.setOwners(new ArrayList<>());
+        }
+    }
+
+    @Override
     public List<Pet> listAvailablePets() {
         return getAll();
     }

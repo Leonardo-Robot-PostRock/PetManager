@@ -6,6 +6,6 @@ import ar.com.petmanager.domain.*;
 
 public interface PetService extends CRUD<Pet> {
     void addOwner(Owner owner, Pet pet);
-
+    void removeAllOwnersFromPet(long petId);
     List<Pet> listAvailablePets();
 }

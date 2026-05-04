@@ -129,7 +129,7 @@ public class DataAccessImpl implements DataAccess {
     // Relationship operations
     @Override
     public void addPetToOwner(int ownerDni, long petId) {
-        String sql = "INSERT INTO owner_pet (owner_dni, pet_id) VALUES (?, ?)";
+        String sql = "INSERT IGNORE INTO owner_pet (owner_dni, pet_id) VALUES (?, ?)";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, ownerDni);
@@ -137,6 +137,18 @@ public class DataAccessImpl implements DataAccess {
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new PersistenceException("Error al relacionar Owner con Pet", e);
+        }
+    }
+
+    @Override
+    public void removeAllOwnersFromPet(long petId) {
+        String sql = "DELETE FROM owner_pet WHERE pet_id = ?";
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, petId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new PersistenceException("Error al quitar dueños del Pet", e);
         }
     }
 
