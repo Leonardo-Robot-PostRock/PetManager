@@ -67,11 +67,17 @@ db.driver=com.mysql.cj.jdbc.Driver
 ### Desde terminal
 
 ```bash
-# Compilar
-javac -cp "lib/mysql-connector-j-8.0.33.jar:." -d out src/ar/com/petmanager/**/*.java
+# 1. Compilar
+javac -cp "lib/mysql-connector-j-8.0.33.jar:." -d out \
+    src/ar/com/petmanager/**/*.java
 
-# Ejecutar
-java -cp "out:lib/mysql-connector-j-8.0.33.jar:resources" ar.com.petmanager.presentation.PetManagerMain
+# 2. Copiar recursos al directorio de salida
+cp -r src/ar/com/petmanager/assets out/ar/com/petmanager/
+cp resources/database.properties out/
+
+# 3. Ejecutar (out + resources en el classpath)
+java -cp "out:lib/mysql-connector-j-8.0.33.jar" \
+    ar.com.petmanager.presentation.PetManagerMain
 ```
 
 > **Nota**: Si no hay MySQL disponible, los servicios usan `ArrayList` en memoria como fallback.
