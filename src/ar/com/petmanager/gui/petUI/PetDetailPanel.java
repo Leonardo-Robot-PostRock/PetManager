@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -329,6 +330,33 @@ public class PetDetailPanel extends BasePanel {
             JOptionPane.showMessageDialog(this,
                     "Esta mascota será marcada como disponible para adopción.",
                     "Dar en Adopción", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        btnAddOwner.addActionListener(e -> {
+            if (currentPet == null) return;
+            // Filtrar owners que ya tienen esta mascota
+            List<Owner> allOwners = ownerService.getAll();
+            List<Owner> currentOwners = currentPet.getOwners();
+            List<Owner> available = new ArrayList<>();
+            for (Owner o : allOwners) {
+                if (currentOwners != null && currentOwners.contains(o)) continue;
+                available.add(o);
+            }
+            if (available.isEmpty()) {
+                showError("No hay dueños disponibles para asignar.");
+                return;
+            }
+            JComboBox<Owner> cmb = new JComboBox<>();
+            for (Owner o : available) cmb.addItem(o);
+
+            int result = JOptionPane.showConfirmDialog(this, cmb,
+                    "Agregar Dueño", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                Owner selected = (Owner) cmb.getSelectedItem();
+                petService.addOwner(selected, currentPet);
+                JOptionPane.showMessageDialog(this,
+                        "Dueño asignado correctamente.");
+            }
         });
 
         cmbStatus.setEnabled(false);
