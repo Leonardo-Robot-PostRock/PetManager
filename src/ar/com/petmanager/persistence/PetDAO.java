@@ -32,8 +32,7 @@ public class PetDAO implements DAO<Pet, Long> {
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
-                long generatedId = rs.getLong(1);
-                pet.getClass(); 
+                pet.setId(rs.getLong(1));
             }
         } catch (SQLException e) {
             throw new PersistenceException("Error al crear Pet", e);
@@ -125,6 +124,7 @@ public class PetDAO implements DAO<Pet, Long> {
                     rs.getString("description")
             );
         }
+        pet.setId(rs.getLong("id"));
         try {
             pet.setStatus(ar.com.petmanager.domain.PetStatus.valueOf(rs.getString("status")));
         } catch (IllegalArgumentException | SQLException e) {
