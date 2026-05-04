@@ -148,10 +148,10 @@ public class OwnerDAO implements DAO<Owner, Integer> {
         String type = rs.getString("type");
         Pet pet;
         if ("DOG".equals(type)) {
-            pet = new ar.com.petmanager.domain.Dog(rs.getString("name"), rs.getInt("age"), rs.getDouble("weight"), rs.getString("race"),
+            pet = new ar.com.petmanager.domain.Dog(rs.getString("name"),                     rs.getString("age"), rs.getDouble("weight"), rs.getString("race"),
                     rs.getBoolean("is_sick"), rs.getString("description"));
         } else {
-            pet = new ar.com.petmanager.domain.Cat(rs.getString("name"), rs.getInt("age"), rs.getDouble("weight"), rs.getString("race"),
+            pet = new ar.com.petmanager.domain.Cat(rs.getString("name"),                     rs.getString("age"), rs.getDouble("weight"), rs.getString("race"),
                     rs.getBoolean("is_sick"), rs.getString("description"));
         }
         try {
