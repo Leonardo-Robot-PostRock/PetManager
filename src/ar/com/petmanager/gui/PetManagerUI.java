@@ -1,5 +1,7 @@
 package ar.com.petmanager.gui;
 
+import ar.com.petmanager.data.DataAccess;
+import ar.com.petmanager.data.DataAccessImpl;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.gui.adoptionUI.AdoptionUI;
 import ar.com.petmanager.gui.constants.UIConstants;
@@ -49,11 +51,25 @@ public class PetManagerUI extends JFrame {
     private final DonorServiceImpl donorService;
 
     public PetManagerUI() {
-        // Inicializar servicios
-        this.ownerService = new OwnerServiceImpl();
-        this.vetService = new VetServiceImpl(ownerService);
-        this.petService = new PetServiceImpl();
-        this.donorService = new DonorServiceImpl();
+        // Intentar conectar a la base de datos; si falla, modo in-memory
+        DataAccess dataAccess = null;
+        try {
+            dataAccess = new DataAccessImpl();
+        } catch (Exception e) {
+            e.printStackTrace();   // <-- ver en la consola de IntelliJ
+            JOptionPane.showMessageDialog(
+                    null,
+                    "No se pudo conectar a la base de datos.\nTrabajando en modo memoria (los datos no se guardarán).\n\nDetalle: " + e.getMessage(),
+                    "Advertencia de conexión",
+                    JOptionPane.WARNING_MESSAGE
+            );
+        }
+
+        // Inicializar servicios con DataAccess (null = fallback in-memory)
+        this.ownerService = new OwnerServiceImpl(dataAccess);
+        this.vetService = new VetServiceImpl(ownerService, dataAccess);
+        this.petService = new PetServiceImpl(dataAccess);
+        this.donorService = new DonorServiceImpl(dataAccess);
 
         // Configurar ventana
         setTitle(UIConstants.APP_TITLE);
@@ -220,6 +236,9 @@ public class PetManagerUI extends JFrame {
                 break;
             case "mascotas":
                 petPanel.showList();
+                break;
+            case "dueños":
+                ownerPanel.updateTableData();
                 break;
             default:
                 break;
