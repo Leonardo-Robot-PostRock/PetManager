@@ -1,6 +1,7 @@
 package ar.com.petmanager.gui.donorsUI;
 
 import ar.com.petmanager.domain.Donor;
+import ar.com.petmanager.domain.Sex;
 import ar.com.petmanager.gui.base.BasePanel;
 import ar.com.petmanager.gui.constants.UIConstants;
 import ar.com.petmanager.service.DonorService;
@@ -197,6 +198,7 @@ public class ContactDonorsUI extends BasePanel {
         JTextField txtPhone   = new JTextField();
         JTextField txtStreet  = new JTextField();
         JTextField txtCity    = new JTextField();
+        JComboBox<Sex> cmbSex = new JComboBox<>(Sex.values());
 
         form.add(new JLabel("DNI:"));       form.add(txtDni);
         form.add(new JLabel("Nombre:"));    form.add(txtName);
@@ -204,6 +206,7 @@ public class ContactDonorsUI extends BasePanel {
         form.add(new JLabel("Teléfono:")); form.add(txtPhone);
         form.add(new JLabel("Calle:"));     form.add(txtStreet);
         form.add(new JLabel("Ciudad:"));    form.add(txtCity);
+        form.add(new JLabel("Sexo:"));      form.add(cmbSex);
 
         int result = JOptionPane.showConfirmDialog(this, form,
                 "Agregar Donante", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -224,7 +227,8 @@ public class ContactDonorsUI extends BasePanel {
                 return;
             }
 
-            Donor donor = new Donor(dni, name, surname, phone, street, city);
+            Sex sex = (Sex) cmbSex.getSelectedItem();
+            Donor donor = new Donor(dni, name, surname, phone, sex, street, city);
             donorService.add(donor);
             loadData();
         } catch (NumberFormatException ex) {

@@ -2,8 +2,8 @@ package ar.com.petmanager.domain;
 
 public class Donor extends Person {
 
-	public Donor(int dni, String name, String surname, long phone, String street, String city) {
-		super(dni, name, surname, phone, street, city);
+	public Donor(int dni, String name, String surname, long phone, Sex sex, String street, String city) {
+		super(dni, name, surname, phone, sex, street, city);
 	}
 
 	@Override

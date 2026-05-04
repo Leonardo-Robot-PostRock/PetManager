@@ -1,6 +1,7 @@
 package ar.com.petmanager.gui.ownerUI;
 
 import ar.com.petmanager.domain.Owner;
+import ar.com.petmanager.domain.Sex;
 import ar.com.petmanager.domain.Vet;
 import ar.com.petmanager.gui.base.BasePanel;
 import ar.com.petmanager.gui.constants.UIConstants;
@@ -34,6 +35,7 @@ public class OwnerUI extends BasePanel {
     private JTextField txtStreet;
     private JTextField txtCity;
     private JComboBox<Vet> cmbPreferredVet;
+    private JComboBox<Sex> cmbSex;
 
     // Tabla
     private JTable tblOwners;
@@ -61,6 +63,7 @@ public class OwnerUI extends BasePanel {
         txtStreet = createTextField();
         txtCity = createTextField();
         cmbPreferredVet = new JComboBox<>();
+        cmbSex = new JComboBox<>(Sex.values());
 
         btnSave = createButton("Guardar", UIConstants.COLOR_SUCCESS);
         btnUpdate = createButton("Actualizar", UIConstants.COLOR_ACCENT);
@@ -115,6 +118,7 @@ public class OwnerUI extends BasePanel {
         addField(fieldsPanel, gbc, "Calle:", txtStreet, 1, 1);
         addField(fieldsPanel, gbc, "Ciudad:", txtCity, 2, 1);
         addField(fieldsPanel, gbc, "Veterinaria Preferida:", cmbPreferredVet, 0, 2);
+        addField(fieldsPanel, gbc, "Sexo:", cmbSex, 0, 3);
 
         // Botones
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_SMALL, 0));
@@ -255,7 +259,8 @@ public class OwnerUI extends BasePanel {
                 return;
             }
 
-            Owner owner = new Owner(dni, name, surname, phone, street, city);
+            Sex sex = (Sex) cmbSex.getSelectedItem();
+            Owner owner = new Owner(dni, name, surname, phone, sex, street, city);
             Vet preferredVet = (Vet) cmbPreferredVet.getSelectedItem();
             if (preferredVet != null) {
                 owner.setPreferredVet(preferredVet);
@@ -291,6 +296,7 @@ public class OwnerUI extends BasePanel {
             owner.setPhone(Long.parseLong(txtPhone.getText()));
             owner.getAddress().setStreet(txtStreet.getText());
             owner.getAddress().setCity(txtCity.getText());
+            owner.setSex((Sex) cmbSex.getSelectedItem());
 
             Vet preferredVet = (Vet) cmbPreferredVet.getSelectedItem();
             owner.setPreferredVet(preferredVet);
@@ -332,19 +338,25 @@ public class OwnerUI extends BasePanel {
         txtStreet.setText("");
         txtCity.setText("");
         cmbPreferredVet.setSelectedIndex(-1);
+        cmbSex.setSelectedIndex(0);
         txtDni.setEditable(true);
         btnSave.setEnabled(true);
         tblOwners.clearSelection();
     }
 
     private void fillFormFromRow(int row) {
-        txtDni.setText(String.valueOf(tableModel.getValueAt(row, 0)));
-        txtName.setText((String) tableModel.getValueAt(row, 1));
-        txtSurname.setText((String) tableModel.getValueAt(row, 2));
-        txtPhone.setText(String.valueOf(tableModel.getValueAt(row, 3)));
-        String[] direccion = ((String) tableModel.getValueAt(row, 4)).split(",");
-        txtStreet.setText(direccion[0].trim());
-        txtCity.setText(direccion.length > 1 ? direccion[1].trim() : "");
+        int dni = (int) tableModel.getValueAt(row, 0);
+        Owner owner = ownerService.getById(dni);
+        if (owner == null) return;
+
+        txtDni.setText(String.valueOf(owner.getDni()));
+        txtName.setText(owner.getName());
+        txtSurname.setText(owner.getSurname());
+        txtPhone.setText(String.valueOf(owner.getPhone()));
+        txtStreet.setText(owner.getAddress().getStreet());
+        txtCity.setText(owner.getAddress().getCity());
+        cmbPreferredVet.setSelectedItem(owner.getPreferredVet());
+        cmbSex.setSelectedItem(owner.getSex());
         txtDni.setEditable(false);
         btnSave.setEnabled(false);
     }

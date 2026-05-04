@@ -5,13 +5,15 @@ public abstract class Person {
 	private String name;
 	private String surname;
 	private long phone;
+	private Sex sex;
 	private Address address;
 
-	public Person(int dni, String name, String surname, long phone, String street, String city) {
+	public Person(int dni, String name, String surname, long phone, Sex sex, String street, String city) {
 		this.dni = dni;
 		this.name = name;
 		this.surname = surname;
 		this.phone = phone;
+		this.sex = sex;
 		this.address = new Address(street, city);
 	}
 
@@ -45,6 +47,14 @@ public abstract class Person {
 
 	public void setPhone(long phone) {
 		this.phone = phone;
+	}
+
+	public Sex getSex() {
+		return sex;
+	}
+
+	public void setSex(Sex sex) {
+		this.sex = sex;
 	}
 
 	public Address getAddress() {

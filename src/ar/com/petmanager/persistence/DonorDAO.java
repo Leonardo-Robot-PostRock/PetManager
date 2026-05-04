@@ -1,6 +1,7 @@
 package ar.com.petmanager.persistence;
 
 import ar.com.petmanager.domain.Donor;
+import ar.com.petmanager.domain.Sex;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +20,7 @@ public class DonorDAO implements DAO<Donor, Integer> {
 
     @Override
     public void create(Donor donor) {
-        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type) VALUES (?, ?, ?, ?, ?, ?, 'DONOR')";
+        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type, sex) VALUES (?, ?, ?, ?, ?, ?, 'DONOR', ?)";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, donor.getDni());
@@ -28,6 +29,7 @@ public class DonorDAO implements DAO<Donor, Integer> {
             stmt.setLong(4, donor.getPhone());
             stmt.setString(5, donor.getAddress().getStreet());
             stmt.setString(6, donor.getAddress().getCity());
+            stmt.setString(7, donor.getSex().name());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new PersistenceException("Error al crear Donor", e);
@@ -36,7 +38,7 @@ public class DonorDAO implements DAO<Donor, Integer> {
 
     @Override
     public void update(Donor donor) {
-        String sql = "UPDATE persons SET name = ?, surname = ?, phone = ?, street = ?, city = ? WHERE dni = ? AND type = 'DONOR'";
+        String sql = "UPDATE persons SET name = ?, surname = ?, phone = ?, street = ?, city = ?, sex = ? WHERE dni = ? AND type = 'DONOR'";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, donor.getName());
@@ -44,7 +46,8 @@ public class DonorDAO implements DAO<Donor, Integer> {
             stmt.setLong(3, donor.getPhone());
             stmt.setString(4, donor.getAddress().getStreet());
             stmt.setString(5, donor.getAddress().getCity());
-            stmt.setInt(6, donor.getDni());
+            stmt.setString(6, donor.getSex().name());
+            stmt.setInt(7, donor.getDni());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new PersistenceException("Error al actualizar Donor", e);
@@ -96,11 +99,18 @@ public class DonorDAO implements DAO<Donor, Integer> {
     }
 
     private Donor mapResultSetToDonor(ResultSet rs) throws SQLException {
+        Sex sex;
+        try {
+            sex = Sex.valueOf(rs.getString("sex"));
+        } catch (IllegalArgumentException | SQLException e) {
+            sex = Sex.MASCULINO; // default
+        }
         return new Donor(
                 rs.getInt("dni"),
                 rs.getString("name"),
                 rs.getString("surname"),
                 rs.getLong("phone"),
+                sex,
                 rs.getString("street"),
                 rs.getString("city")
         );

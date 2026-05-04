@@ -7,8 +7,8 @@ public class Owner extends Person {
     private Vet preferredVet;
     private List<Pet> pets;
 
-    public Owner(int dni, String name, String surname, int phone, String street, String city) {
-        super(dni, name, surname, phone, street, city);
+    public Owner(int dni, String name, String surname, int phone, Sex sex, String street, String city) {
+        super(dni, name, surname, phone, sex, street, city);
         this.pets = new ArrayList<>();
     }
 

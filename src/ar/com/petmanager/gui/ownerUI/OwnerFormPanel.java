@@ -1,6 +1,7 @@
 package ar.com.petmanager.gui.ownerUI;
 
 import ar.com.petmanager.domain.Owner;
+import ar.com.petmanager.domain.Sex;
 import ar.com.petmanager.domain.Vet;
 import ar.com.petmanager.service.OwnerServiceImpl;
 import ar.com.petmanager.service.VetServiceImpl;
@@ -38,7 +39,8 @@ public class OwnerFormPanel extends OwnerPanelBase {
             String street = txtStreet.getText();
             String city = txtCity.getText();
 
-            Owner owner = new Owner(dni, name, surname, phone, street, city);
+            Sex sex = (Sex) cmbSex.getSelectedItem();
+            Owner owner = new Owner(dni, name, surname, phone, sex, street, city);
 
             Vet preferredVet = (Vet) selectPreferredVet.getSelectedItem();
 

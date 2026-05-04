@@ -2,6 +2,7 @@ package ar.com.petmanager.persistence;
 
 import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Pet;
+import ar.com.petmanager.domain.Sex;
 import ar.com.petmanager.domain.Vet;
 
 import java.sql.Connection;
@@ -21,7 +22,7 @@ public class OwnerDAO implements DAO<Owner, Integer> {
 
     @Override
     public void create(Owner owner) {
-        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type, preferred_vet_id) VALUES (?, ?, ?, ?, ?, ?, 'OWNER', ?)";
+        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type, sex, preferred_vet_id) VALUES (?, ?, ?, ?, ?, ?, 'OWNER', ?, ?)";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, owner.getDni());
@@ -30,10 +31,11 @@ public class OwnerDAO implements DAO<Owner, Integer> {
             stmt.setLong(4, owner.getPhone());
             stmt.setString(5, owner.getAddress().getStreet());
             stmt.setString(6, owner.getAddress().getCity());
-            if (owner.getPreferredVet() != null) {
-                stmt.setLong(7, owner.getPreferredVet().getIdVet());
+            stmt.setString(7, owner.getSex().name());
+            if (owner.getPreferredVet()!=null) {
+                stmt.setLong(8, owner.getPreferredVet().getIdVet());
             } else {
-                stmt.setNull(7, java.sql.Types.BIGINT);
+                stmt.setNull(8, java.sql.Types.BIGINT);
             }
             stmt.executeUpdate();
             savePets(conn, owner);
@@ -44,7 +46,7 @@ public class OwnerDAO implements DAO<Owner, Integer> {
 
     @Override
     public void update(Owner owner) {
-        String sql = "UPDATE persons SET name = ?, surname = ?, phone = ?, street = ?, city = ?, preferred_vet_id = ? WHERE dni = ? AND type = 'OWNER'";
+        String sql = "UPDATE persons SET name = ?, surname = ?, phone = ?, street = ?, city = ?, sex = ?, preferred_vet_id = ? WHERE dni = ? AND type = 'OWNER'";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, owner.getName());
@@ -52,12 +54,13 @@ public class OwnerDAO implements DAO<Owner, Integer> {
             stmt.setLong(3, owner.getPhone());
             stmt.setString(4, owner.getAddress().getStreet());
             stmt.setString(5, owner.getAddress().getCity());
-            if (owner.getPreferredVet() != null) {
-                stmt.setLong(6, owner.getPreferredVet().getIdVet());
+            stmt.setString(6, owner.getSex().name());
+            if (owner.getPreferredVet()!=null) {
+                stmt.setLong(7, owner.getPreferredVet().getIdVet());
             } else {
-                stmt.setNull(6, java.sql.Types.BIGINT);
+                stmt.setNull(7, java.sql.Types.BIGINT);
             }
-            stmt.setInt(7, owner.getDni());
+            stmt.setInt(8, owner.getDni());
             stmt.executeUpdate();
             updatePets(conn, owner);
         } catch (SQLException e) {
@@ -110,11 +113,18 @@ public class OwnerDAO implements DAO<Owner, Integer> {
     }
 
     private Owner mapResultSetToOwner(ResultSet rs) throws SQLException {
+        Sex sex;
+        try {
+            sex = Sex.valueOf(rs.getString("sex"));
+        } catch (IllegalArgumentException | SQLException e) {
+            sex = Sex.MASCULINO; // default si no existe
+        }
         Owner owner = new Owner(
                 rs.getInt("dni"),
                 rs.getString("name"),
                 rs.getString("surname"),
                 (int) rs.getLong("phone"),
+                sex,
                 rs.getString("street"),
                 rs.getString("city")
         );
@@ -148,10 +158,10 @@ public class OwnerDAO implements DAO<Owner, Integer> {
         String type = rs.getString("type");
         Pet pet;
         if ("DOG".equals(type)) {
-            pet = new ar.com.petmanager.domain.Dog(rs.getString("name"),                     rs.getString("age"), rs.getDouble("weight"), rs.getString("race"),
+            pet = new ar.com.petmanager.domain.Dog(rs.getString("name"), rs.getString("age"), rs.getDouble("weight"), rs.getString("race"),
                     rs.getBoolean("is_sick"), rs.getString("description"));
         } else {
-            pet = new ar.com.petmanager.domain.Cat(rs.getString("name"),                     rs.getString("age"), rs.getDouble("weight"), rs.getString("race"),
+            pet = new ar.com.petmanager.domain.Cat(rs.getString("name"), rs.getString("age"), rs.getDouble("weight"), rs.getString("race"),
                     rs.getBoolean("is_sick"), rs.getString("description"));
         }
         try {
@@ -162,24 +172,28 @@ public class OwnerDAO implements DAO<Owner, Integer> {
         return pet;
     }
 
-    private void savePets(Connection conn, Owner owner) throws SQLException {
-        if (owner.getPets() != null && !owner.getPets().isEmpty()) {
-            for (Pet pet : owner.getPets()) {
-                String sql = "INSERT INTO owner_pet (owner_dni, pet_id) VALUES (?, ?)";
-                try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                    stmt.setInt(1, owner.getDni());
-                    stmt.setLong(2, pet.getId());
-                    stmt.executeUpdate();
-                }
+    private void savePets(Connection conn, Owner owner) {
+        if (owner.getPets()==null || owner.getPets().isEmpty()) return;
+        for (Pet pet : owner.getPets()) {
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO owner_pet (owner_dni, pet_id) VALUES (?, ?)")) {
+                stmt.setInt(1, owner.getDni());
+                stmt.setLong(2, pet.getId());
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                // El pet puede no existir aún en BD (está solo en memoria)
+                System.err.println("No se pudo relacionar pet " + pet.getId() + ": " + e.getMessage());
             }
         }
     }
 
-    private void updatePets(Connection conn, Owner owner) throws SQLException {
-        String sql = "DELETE FROM owner_pet WHERE owner_dni = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+    private void updatePets(Connection conn, Owner owner) {
+        try (PreparedStatement stmt = conn.prepareStatement(
+                "DELETE FROM owner_pet WHERE owner_dni = ?")) {
             stmt.setInt(1, owner.getDni());
             stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error al limpiar relaciones: " + e.getMessage());
         }
         savePets(conn, owner);
     }

@@ -1,5 +1,6 @@
 package ar.com.petmanager.gui.ownerUI;
 
+import ar.com.petmanager.domain.Sex;
 import ar.com.petmanager.domain.Vet;
 import ar.com.petmanager.service.VetServiceImpl;
 
@@ -16,6 +17,7 @@ public abstract class OwnerPanelBase extends JPanel {
     protected JTextField txtPhone;
     protected JTextField txtStreet;
     protected JTextField txtCity;
+    protected JComboBox<Sex> cmbSex;
     protected JComboBox<Vet> selectPreferredVet;
 
     protected VetServiceImpl vetService;
@@ -36,6 +38,8 @@ public abstract class OwnerPanelBase extends JPanel {
         txtCity = new JTextField(15);
         selectPreferredVet = new JComboBox<>();
         selectPreferredVet.setPreferredSize(new Dimension(170, 20));
+        cmbSex = new JComboBox<>(Sex.values());
+        cmbSex.setPreferredSize(new Dimension(170, 20));
     }
 
     private void arrangeComponents() {
@@ -56,6 +60,12 @@ public abstract class OwnerPanelBase extends JPanel {
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.WEST;
         add(selectPreferredVet, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        add(new JLabel("Sexo:"), gbc);
+        gbc.gridx = 1;
+        add(cmbSex, gbc);
     }
 
     private void addLabelAndField(String labelText, JTextField textField, GridBagConstraints gbc, int gridy) {
