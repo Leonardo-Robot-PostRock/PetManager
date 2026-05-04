@@ -1,70 +1,90 @@
 package ar.com.petmanager.service;
 
+import ar.com.petmanager.data.DataAccess;
+import ar.com.petmanager.domain.Owner;
+import ar.com.petmanager.domain.Pet;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import ar.com.petmanager.domain.*;
 
 public class PetServiceImpl implements PetService {
-    private final List<Pet> availablePets;
 
-    public PetServiceImpl() {
-        this.availablePets = new ArrayList<Pet>();
-    }
+    private final DataAccess dataAccess;
+    private final List<Pet> cache;    // fallback in-memory cuando no hay DB
 
-    @Override
-    public void addOwner(Owner owner, Pet pet) {
-
-        if (owner == null || owner.getDni() <= 0) return;
-
-        if (!availablePets.contains(pet)) return;
-
-        owner.adoptPet(pet);
-        availablePets.remove(pet);
-    }
-
-    @Override
-    public List<Pet> listAvailablePets() {
-        return new ArrayList<>(availablePets);
+    public PetServiceImpl(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+        this.cache = new ArrayList<>();
     }
 
     @Override
     public void add(Pet pet) {
-        availablePets.add(pet);
+        if (dataAccess != null) {
+            dataAccess.savePet(pet);
+        } else {
+            cache.add(pet);
+        }
     }
 
     @Override
     public void deleteById(int id) {
-        Pet petToDelete = getById(id);
-        if (petToDelete != null) {
-            availablePets.remove(petToDelete);
+        if (dataAccess != null) {
+            dataAccess.deletePet(id);
+        } else {
+            Pet pet = getById(id);
+            if (pet != null) cache.remove(pet);
         }
     }
 
     @Override
     public Pet getById(int id) {
-        return availablePets.stream().filter(pet -> pet.getId() == id).findFirst().orElse(null);
+        if (dataAccess != null) {
+            return dataAccess.getPet(id);
+        }
+        return cache.stream().filter(p -> p.getId() == id).findFirst().orElse(null);
     }
 
     @Override
     public List<Pet> getAll() {
-        return new ArrayList<>(availablePets);
+        if (dataAccess != null) {
+            return dataAccess.getAllPets();
+        }
+        return new ArrayList<>(cache);
     }
 
     @Override
     public void update(Pet pet) {
-        Optional<Pet> optionalPet = availablePets.stream().filter(existingPet -> pet.getId() == existingPet.getId()).findFirst();
-
-        if (optionalPet.isPresent()) {
-            Pet foundPet = optionalPet.get();
-
-            foundPet.setName(pet.getName());
-            foundPet.setAge(pet.getAge());
-            foundPet.setRace(pet.getRace());
-            foundPet.setWeight(pet.getWeight());
-            foundPet.setSick(pet.isSick());
-            foundPet.setDescription(pet.getDescription());
+        if (dataAccess != null) {
+            dataAccess.updatePet(pet);
+        } else {
+            cache.stream()
+                    .filter(p -> p.getId() == pet.getId())
+                    .findFirst()
+                    .ifPresent(found -> {
+                        found.setName(pet.getName());
+                        found.setAge(pet.getAge());
+                        found.setRace(pet.getRace());
+                        found.setWeight(pet.getWeight());
+                        found.setSick(pet.isSick());
+                        found.setDescription(pet.getDescription());
+                        found.setStatus(pet.getStatus());
+                    });
         }
+    }
+
+    @Override
+    public void addOwner(Owner owner, Pet pet) {
+        if (owner == null || owner.getDni() <= 0) return;
+        if (getById((int) pet.getId()) == null) return;
+
+        if (dataAccess != null) {
+            dataAccess.addPetToOwner(owner.getDni(), pet.getId());
+        }
+        owner.adoptPet(pet);
+    }
+
+    @Override
+    public List<Pet> listAvailablePets() {
+        return getAll();
     }
 }
