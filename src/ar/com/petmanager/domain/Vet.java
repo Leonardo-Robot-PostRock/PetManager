@@ -1,7 +1,7 @@
 package ar.com.petmanager.domain;
 
 public class Vet {
-	private final long idVet;
+	private long idVet;
 	private String name;
 	private int phone;
 	private Address address;
@@ -20,6 +20,10 @@ public class Vet {
 
 	public long getIdVet() {
 		return idVet;
+	}
+
+	public void setIdVet(long idVet) {
+		this.idVet = idVet;
 	}
 
 	public String getName() {
@@ -44,6 +48,11 @@ public class Vet {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+
+	@Override
+	public String toString() {
+		return name + " — " + (address != null ? address.getCity() : "");
 	}
 
 }

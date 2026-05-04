@@ -1,37 +1,45 @@
 package ar.com.petmanager.service;
 
+import ar.com.petmanager.data.DataAccess;
 import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Vet;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class VetServiceImpl implements VetService {
-    List<Vet> availableVets;
+
+    private final DataAccess dataAccess;
+    private final List<Vet> cache;         // fallback in-memory cuando no hay DB
     private final OwnerService ownerService;
 
-    public VetServiceImpl(OwnerService ownerService) {
-        this.availableVets = new ArrayList<Vet>();
+    public VetServiceImpl(OwnerService ownerService, DataAccess dataAccess) {
         this.ownerService = ownerService;
+        this.dataAccess = dataAccess;
+        this.cache = new ArrayList<>();
     }
 
     @Override
     public void add(Vet vet) {
-        this.availableVets.add(vet);
+        if (dataAccess != null) {
+            dataAccess.saveVet(vet);
+        } else {
+            cache.add(vet);
+        }
     }
 
     @Override
-    public void deleteById(int dni) {
-        Vet vet = this.getById(dni);
-
-        if (vet != null) {
-            this.availableVets.remove(vet);
-            List<Owner> owners = this.ownerService.getAll();
-
-            for (Owner owner : owners) {
-                if (owner.getPreferredVet() != null && owner.getPreferredVet().equals(vet)) {
-                    owner.removePreferredVet();
+    public void deleteById(int id) {
+        if (dataAccess != null) {
+            dataAccess.deleteVet(id);
+        } else {
+            Vet vet = getById(id);
+            if (vet != null) {
+                cache.remove(vet);
+                for (Owner owner : ownerService.getAll()) {
+                    if (owner.getPreferredVet() != null && owner.getPreferredVet().getIdVet() == id) {
+                        owner.removePreferredVet();
+                    }
                 }
             }
         }
@@ -39,24 +47,33 @@ public class VetServiceImpl implements VetService {
 
     @Override
     public Vet getById(int id) {
-        return this.availableVets.stream().filter(vet -> vet.getIdVet() == id).findFirst().orElse(null);
+        if (dataAccess != null) {
+            return dataAccess.getVet(id);
+        }
+        return cache.stream().filter(v -> v.getIdVet() == id).findFirst().orElse(null);
     }
 
     @Override
     public List<Vet> getAll() {
-        return new ArrayList<Vet>(availableVets);
+        if (dataAccess != null) {
+            return dataAccess.getAllVets();
+        }
+        return new ArrayList<>(cache);
     }
 
     @Override
     public void update(Vet vet) {
-        Optional<Vet> optionalVet = this.availableVets.stream().filter(existingVet -> vet.getIdVet() == existingVet.getIdVet()).findFirst();
-
-        if (optionalVet.isPresent()) {
-            Vet foundVet = optionalVet.get();
-
-            foundVet.setName(vet.getName());
-            foundVet.setPhone(vet.getPhone());
-            foundVet.setAddress(vet.getAddress());
+        if (dataAccess != null) {
+            dataAccess.updateVet(vet);
+        } else {
+            cache.stream()
+                    .filter(v -> v.getIdVet() == vet.getIdVet())
+                    .findFirst()
+                    .ifPresent(found -> {
+                        found.setName(vet.getName());
+                        found.setPhone(vet.getPhone());
+                        found.setAddress(vet.getAddress());
+                    });
         }
     }
 }
