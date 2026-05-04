@@ -89,7 +89,7 @@ public class PetManagerUI extends JFrame {
     private void initializeViews() {
         homePanel = new HomeUI(panelName -> navigateTo(panelName));
         ownerPanel = new OwnerUI(ownerService, vetService);
-        petPanel = new PetUI(petService);
+        petPanel = new PetUI(petService, ownerService);
         vetsPanel = new VetsUI(vetService);
         donorsPanel = new ContactDonorsUI(donorService);
         adoptionPanel = new AdoptionUI(petService, ownerService);

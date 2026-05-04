@@ -25,16 +25,17 @@ public class PetDetailPanel extends BasePanel {
 
     private JLabel lblName;
     private JLabel lblType;
-    private JLabel lblAge;
-    private JLabel lblWeight;
+    private JTextField txtAge;
+    private JTextField txtWeight;
     private JLabel lblRace;
-    private JLabel lblSick;
+    private JCheckBox chkSick;
     private JLabel lblStatus;
     private JComboBox<PetStatus> cmbStatus;
     private JTextArea txtDescription;
 
     private JPanel avatarPanel;
     private JButton btnEdit;
+    private JButton btnSave;
     private JButton btnDelete;
     private JButton btnAdopt;
     private JButton btnBack;
@@ -53,10 +54,19 @@ public class PetDetailPanel extends BasePanel {
     private void initializeComponents() {
         lblName = new JLabel();
         lblType = new JLabel();
-        lblAge = new JLabel();
-        lblWeight = new JLabel();
+        txtAge = new JTextField();
+        txtAge.setEditable(false);
+        txtAge.setFont(UIConstants.FONT_BODY);
+        txtAge.setPreferredSize(new Dimension(120, 28));
+        txtWeight = new JTextField();
+        txtWeight.setEditable(false);
+        txtWeight.setFont(UIConstants.FONT_BODY);
+        txtWeight.setPreferredSize(new Dimension(120, 28));
         lblRace = new JLabel();
-        lblSick = new JLabel();
+        chkSick = new JCheckBox();
+        chkSick.setEnabled(false);
+        chkSick.setFont(UIConstants.FONT_BODY);
+        chkSick.setOpaque(false);
         lblStatus = new JLabel();
         cmbStatus = new JComboBox<>(PetStatus.values());
 
@@ -72,6 +82,8 @@ public class PetDetailPanel extends BasePanel {
         avatarPanel.setOpaque(false);
 
         btnEdit = createButton("Editar", UIConstants.COLOR_ACCENT);
+        btnSave = createButton("Guardar", UIConstants.COLOR_SUCCESS);
+        btnSave.setVisible(false);
         btnDelete = createButton("Eliminar", UIConstants.COLOR_ERROR);
         btnAdopt = createButton("Dar en Adopción", UIConstants.COLOR_CARD_OWNER);
         btnBack = createButton("← Volver", UIConstants.COLOR_TEXT_SECONDARY);
@@ -99,6 +111,7 @@ public class PetDetailPanel extends BasePanel {
         actionPanel.setOpaque(false);
         actionPanel.setBorder(new EmptyBorder(UIConstants.PADDING_LARGE, 0, 0, 0));
         actionPanel.add(btnEdit);
+        actionPanel.add(btnSave);
         actionPanel.add(btnAdopt);
         actionPanel.add(btnDelete);
 
@@ -131,10 +144,10 @@ public class PetDetailPanel extends BasePanel {
         panel.add(lblName);
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
         panel.add(createInfoRow("Tipo:", lblType));
-        panel.add(createInfoRow("Edad:", lblAge));
-        panel.add(createInfoRow("Peso:", lblWeight));
+        panel.add(createTextFieldRow("Edad:", txtAge));
+        panel.add(createTextFieldRow("Peso:", txtWeight));
         panel.add(createInfoRow("Raza:", lblRace));
-        panel.add(createInfoRow("Salud:", lblSick));
+        panel.add(createCheckRow("Salud:", chkSick));
         panel.add(createComboRow("Estatus:", cmbStatus));
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
 
@@ -171,6 +184,36 @@ public class PetDetailPanel extends BasePanel {
         return row;
     }
 
+    private JPanel createTextFieldRow(String label, JTextField field) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
+        row.setOpaque(false);
+
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(UIConstants.FONT_BODY_BOLD);
+        lbl.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        lbl.setPreferredSize(new Dimension(60, 25));
+
+        row.add(lbl);
+        row.add(field);
+
+        return row;
+    }
+
+    private JPanel createCheckRow(String label, JCheckBox check) {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
+        row.setOpaque(false);
+
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(UIConstants.FONT_BODY_BOLD);
+        lbl.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        lbl.setPreferredSize(new Dimension(60, 25));
+
+        row.add(lbl);
+        row.add(check);
+
+        return row;
+    }
+
     private JPanel createComboRow(String label, JComboBox<?> combo) {
         JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
         row.setOpaque(false);
@@ -198,16 +241,16 @@ public class PetDetailPanel extends BasePanel {
 
         lblName.setText(pet.getName());
         lblType.setText(pet instanceof ar.com.petmanager.domain.Dog ? "Perro" : "Gato");
-        lblAge.setText(pet.getAge() + " años");
-        lblWeight.setText(String.format("%.1f kg", pet.getWeight()));
+        txtAge.setText(pet.getAge());
+        txtWeight.setText(String.format("%.1f", pet.getWeight()));
         lblRace.setText(pet.getRace());
-        lblSick.setText(pet.isSick() ? "Enfermo" : "Saludable");
-        lblSick.setForeground(pet.isSick() ? UIConstants.COLOR_ERROR : UIConstants.COLOR_SUCCESS);
+        chkSick.setSelected(pet.isSick());
         lblStatus.setText(pet.getStatus() != null ? pet.getStatus().getLabel() : "Activa");
         cmbStatus.setSelectedItem(pet.getStatus() != null ? pet.getStatus() : PetStatus.ACTIVA);
         txtDescription.setText(pet.getDescription());
 
         updateAvatar(pet);
+        setEditMode(false);
     }
 
     private void updateAvatar(Pet pet) {
@@ -225,9 +268,27 @@ public class PetDetailPanel extends BasePanel {
     private void configureListeners() {
         btnBack.addActionListener(e -> navigateBack());
 
-        btnEdit.addActionListener(e -> {
-            cmbStatus.setEnabled(true);
-            JOptionPane.showMessageDialog(this, "Editá el estado y demás campos, luego confirmá.");
+        btnEdit.addActionListener(e -> setEditMode(true));
+
+        btnSave.addActionListener(e -> {
+            if (currentPet == null) return;
+            try {
+                currentPet.setAge(txtAge.getText().trim());
+                String weightText = txtWeight.getText().trim().replace(',', '.');
+                currentPet.setWeight(Double.parseDouble(weightText));
+                currentPet.setSick(chkSick.isSelected());
+                currentPet.setStatus((PetStatus) cmbStatus.getSelectedItem());
+
+                petService.update(currentPet);
+                lblStatus.setText(currentPet.getStatus().getLabel());
+
+                setEditMode(false);
+                JOptionPane.showMessageDialog(this, "Mascota actualizada correctamente.");
+            } catch (NumberFormatException ex) {
+                showError("El peso debe ser un número válido (ej: 3.5 o 3,5).");
+            } catch (RuntimeException ex) {
+                showError("Error al guardar: " + ex.getMessage());
+            }
         });
 
         btnDelete.addActionListener(e -> {
@@ -248,15 +309,33 @@ public class PetDetailPanel extends BasePanel {
                     "Dar en Adopción", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        cmbStatus.addActionListener(e -> {
-            if (currentPet != null && cmbStatus.getSelectedItem() != null) {
-                PetStatus newStatus = (PetStatus) cmbStatus.getSelectedItem();
-                currentPet.setStatus(newStatus);
-                petService.update(currentPet);
-                lblStatus.setText(newStatus.getLabel());
-            }
-        });
         cmbStatus.setEnabled(false);
+    }
+
+    private void setEditMode(boolean edit) {
+        txtAge.setEditable(edit);
+        txtWeight.setEditable(edit);
+        chkSick.setEnabled(edit);
+        cmbStatus.setEnabled(edit);
+        txtDescription.setEditable(edit);
+
+        btnEdit.setVisible(!edit);
+        btnSave.setVisible(edit);
+        btnAdopt.setVisible(!edit);
+        btnDelete.setVisible(!edit);
+
+        if (!edit && currentPet != null) {
+            // Refrescar campos por si hubo cambios cancelados
+            txtAge.setText(currentPet.getAge());
+            txtWeight.setText(String.format("%.1f", currentPet.getWeight()));
+            chkSick.setSelected(currentPet.isSick());
+            cmbStatus.setSelectedItem(currentPet.getStatus());
+            txtDescription.setText(currentPet.getDescription());
+        }
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
     private void navigateBack() {

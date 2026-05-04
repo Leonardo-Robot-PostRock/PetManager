@@ -2,9 +2,11 @@ package ar.com.petmanager.gui.petUI;
 
 import ar.com.petmanager.domain.Cat;
 import ar.com.petmanager.domain.Dog;
+import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.gui.base.BasePanel;
 import ar.com.petmanager.gui.constants.UIConstants;
+import ar.com.petmanager.service.OwnerService;
 import ar.com.petmanager.service.PetService;
 
 import javax.swing.*;
@@ -22,6 +24,7 @@ import java.util.List;
 public class PetUI extends BasePanel {
 
     private final PetService petService;
+    private final OwnerService ownerService;
     private final PetDetailPanel detailPanel;
     private final CardLayout cardLayout;
     private final JPanel cards;
@@ -34,8 +37,9 @@ public class PetUI extends BasePanel {
     private JButton btnDelete;
     private JButton btnAdd;
 
-    public PetUI(PetService petService) {
+    public PetUI(PetService petService, OwnerService ownerService) {
         this.petService = petService;
+        this.ownerService = ownerService;
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);
         this.detailPanel = new PetDetailPanel(petService, () -> cardLayout.show(cards, "lista"));
@@ -237,12 +241,21 @@ public class PetUI extends BasePanel {
         JTextArea txtDescription = new JTextArea(3, 20);
         txtDescription.setLineWrap(true);
 
+        // Combo de dueños
+        JComboBox<Owner> cmbOwner = new JComboBox<>();
+        List<Owner> owners = ownerService.getAll();
+        cmbOwner.addItem(null);   // opción "sin dueño"
+        for (Owner owner : owners) {
+            cmbOwner.addItem(owner);
+        }
+
         form.add(new JLabel("Nombre:"));        form.add(txtName);
         form.add(new JLabel("Tipo:"));          form.add(cmbType);
         form.add(new JLabel("Edad:"));          form.add(txtAge);
         form.add(new JLabel("Peso (kg):"));     form.add(txtWeight);
         form.add(new JLabel("Raza:"));          form.add(txtRace);
         form.add(new JLabel("Enfermo:"));       form.add(chkSick);
+        form.add(new JLabel("Dueño:"));         form.add(cmbOwner);
         form.add(new JLabel("Descripción:"));   form.add(new JScrollPane(txtDescription));
 
         int result = JOptionPane.showConfirmDialog(this, form,
@@ -254,8 +267,10 @@ public class PetUI extends BasePanel {
             String name = txtName.getText().trim();
             if (name.isEmpty()) { showError("El nombre es obligatorio."); return; }
 
-            int age = Integer.parseInt(txtAge.getText().trim());
-            double weight = Double.parseDouble(txtWeight.getText().trim());
+            String age = txtAge.getText().trim();
+            // Soportar coma decimal (ej: 3,5 → 3.5)
+            String weightText = txtWeight.getText().trim().replace(',', '.');
+            double weight = Double.parseDouble(weightText);
             String race = txtRace.getText().trim();
             boolean sick = chkSick.isSelected();
             String description = txtDescription.getText().trim();
@@ -265,9 +280,16 @@ public class PetUI extends BasePanel {
                     : new Cat(name, age, weight, race, sick, description);
 
             petService.add(pet);
+
+            // Asignar dueño si se seleccionó uno
+            Owner selectedOwner = (Owner) cmbOwner.getSelectedItem();
+            if (selectedOwner != null) {
+                petService.addOwner(selectedOwner, pet);
+            }
+
             loadTableData();
         } catch (NumberFormatException ex) {
-            showError("Edad y peso deben ser números válidos.");
+            showError("El peso debe ser un número válido (ej: 3.5 o 3,5).");
         }
     }
 
