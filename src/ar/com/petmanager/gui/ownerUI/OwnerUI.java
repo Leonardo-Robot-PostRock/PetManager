@@ -357,7 +357,6 @@ public class OwnerUI extends BasePanel {
     private void loadVets() {
         cmbPreferredVet.removeAllItems();
         List<Vet> vets = vetService.getAll();
-        cmbPreferredVet.addItem(null);
         for (Vet vet : vets) {
             cmbPreferredVet.addItem(vet);
         }
