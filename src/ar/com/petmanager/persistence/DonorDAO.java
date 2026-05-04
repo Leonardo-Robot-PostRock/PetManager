@@ -19,7 +19,7 @@ public class DonorDAO implements DAO<Donor, Integer> {
 
     @Override
     public void create(Donor donor) {
-        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type) VALUES (?, ?, ?, ?, ?, 'DONOR')";
+        String sql = "INSERT INTO persons (dni, name, surname, phone, street, city, type) VALUES (?, ?, ?, ?, ?, ?, 'DONOR')";
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, donor.getDni());
