@@ -185,6 +185,10 @@ public class AdoptionUI extends BasePanel {
         loadOwners();
     }
 
+    public void refreshData() {
+        loadData();
+    }
+
     private void loadOwners() {
         cmbOwners.removeAllItems();
         List<Owner> owners = ownerService.getAll();

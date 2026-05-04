@@ -240,6 +240,9 @@ public class PetManagerUI extends JFrame {
             case "dueños":
                 ownerPanel.updateTableData();
                 break;
+            case "adopciones":
+                adoptionPanel.refreshData();
+                break;
             default:
                 break;
         }

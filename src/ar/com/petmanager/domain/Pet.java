@@ -1,5 +1,6 @@
 package ar.com.petmanager.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Pet {
@@ -16,6 +17,7 @@ public abstract class Pet {
 
     private Pet() {
         this.id = ++Pet.countPet;
+        this.owners = new ArrayList<>();
         this.status = PetStatus.ACTIVA;
     }
 
