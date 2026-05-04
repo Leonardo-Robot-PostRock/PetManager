@@ -1,5 +1,6 @@
 package ar.com.petmanager.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Owner extends Person {
@@ -8,6 +9,7 @@ public class Owner extends Person {
 
     public Owner(int dni, String name, String surname, int phone, String street, String city) {
         super(dni, name, surname, phone, street, city);
+        this.pets = new ArrayList<>();
     }
 
     public Vet getPreferredVet() {

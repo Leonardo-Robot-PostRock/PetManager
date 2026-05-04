@@ -1,20 +1,76 @@
 package ar.com.petmanager.service;
 
+import ar.com.petmanager.data.DataAccess;
 import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.domain.Vet;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class OwnerServiceImpl implements OwnerService {
 
-    private final List<Owner> owners;
+    private final DataAccess dataAccess;
+    private final List<Owner> cache;    // fallback in-memory cuando no hay DB
 
-    public OwnerServiceImpl() {
-        owners = new ArrayList<Owner>();
+    public OwnerServiceImpl(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+        this.cache = new ArrayList<>();
+    }
+
+    @Override
+    public void add(Owner owner) {
+        if (dataAccess != null) {
+            dataAccess.saveOwner(owner);
+        } else {
+            boolean exists = cache.stream().anyMatch(o -> o.getDni() == owner.getDni());
+            if (exists) throw new RuntimeException("El DNI ya está registrado");
+            cache.add(owner);
+        }
+    }
+
+    @Override
+    public void deleteById(int dni) {
+        if (dataAccess != null) {
+            dataAccess.deleteOwner(dni);
+        } else {
+            Owner owner = getById(dni);
+            if (owner != null) cache.remove(owner);
+        }
+    }
+
+    @Override
+    public Owner getById(int dni) {
+        if (dataAccess != null) {
+            return dataAccess.getOwner(dni);
+        }
+        return cache.stream().filter(o -> o.getDni() == dni).findFirst().orElse(null);
+    }
+
+    @Override
+    public List<Owner> getAll() {
+        if (dataAccess != null) {
+            return dataAccess.getAllOwners();
+        }
+        return new ArrayList<>(cache);
+    }
+
+    @Override
+    public void update(Owner owner) {
+        if (dataAccess != null) {
+            dataAccess.updateOwner(owner);
+        } else {
+            cache.stream()
+                    .filter(o -> o.getDni() == owner.getDni())
+                    .findFirst()
+                    .ifPresent(found -> {
+                        found.setName(owner.getName());
+                        found.setSurname(owner.getSurname());
+                        found.setPhone(owner.getPhone());
+                        found.setAddress(owner.getAddress());
+                        found.setPreferredVet(owner.getPreferredVet());
+                    });
+        }
     }
 
     @Override
@@ -25,52 +81,5 @@ public class OwnerServiceImpl implements OwnerService {
     @Override
     public void addPreferredVet(Owner owner, Vet vet) {
         owner.setPreferredVet(vet);
-    }
-
-    @Override
-    public void add(Owner owner) {
-        Optional<Owner> optionalOwner = this.owners.stream().filter(existingOwner -> owner.getDni() == existingOwner.getDni()).findFirst();
-
-        if (optionalOwner.isPresent()) {
-            JOptionPane.showMessageDialog(null, "El DNI ya está registrado");
-        } else {
-            owners.add(owner);
-            JOptionPane.showMessageDialog(null, "Dueño agregado exitosamente.");
-        }
-
-    }
-
-    @Override
-    public void deleteById(int dni) {
-        Owner ownerToDelete = getById(dni);
-        if (ownerToDelete != null) {
-            owners.remove(ownerToDelete);
-        }
-    }
-
-    @Override
-    public Owner getById(int dni) {
-        return owners.stream().filter(existingOwner -> existingOwner.getDni() == dni).findFirst().orElse(null);
-    }
-
-    @Override
-    public List<Owner> getAll() {
-        return new ArrayList<>(owners);
-    }
-
-    @Override
-    public void update(Owner owner) {
-        Optional<Owner> optionalOwner = owners.stream().filter(existingOwner -> existingOwner.getDni() == owner.getDni()).findFirst();
-
-        if (optionalOwner.isPresent()) {
-            Owner foundOwner = optionalOwner.get();
-
-            foundOwner.setDni(owner.getDni());
-            foundOwner.setName(owner.getName());
-            foundOwner.setSurname(owner.getSurname());
-            foundOwner.setPhone(owner.getPhone());
-            foundOwner.setAddress(owner.getAddress());
-            foundOwner.setPreferredVet(owner.getPreferredVet());
-        }
     }
 }
