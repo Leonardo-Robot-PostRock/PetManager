@@ -11,10 +11,12 @@ public abstract class Pet {
     private String race;
     private boolean isSick;
     private String description;
+    private PetStatus status;
     private static int countPet;
 
     private Pet() {
         this.id = ++Pet.countPet;
+        this.status = PetStatus.ACTIVA;
     }
 
     public Pet(String name) {
@@ -90,6 +92,14 @@ public abstract class Pet {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public PetStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PetStatus status) {
+        this.status = status;
     }
 
     public List<Owner> getOwners() {

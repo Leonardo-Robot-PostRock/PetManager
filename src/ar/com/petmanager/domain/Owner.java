@@ -1,6 +1,5 @@
 package ar.com.petmanager.domain;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Owner extends Person {
@@ -24,7 +23,7 @@ public class Owner extends Person {
     }
 
     public void adoptPet(Pet pet) {
-        if (pet != null) {
+        if (pet!=null) {
             pets.add(pet);
             pet.addOwner(this);
         }
@@ -32,6 +31,10 @@ public class Owner extends Person {
 
     public List<Pet> getPets() {
         return pets;
+    }
+
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
     }
 
     @Override
