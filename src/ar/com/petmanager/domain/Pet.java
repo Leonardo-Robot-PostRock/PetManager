@@ -112,6 +112,10 @@ public abstract class Pet {
         return owners;
     }
 
+    public void setOwners(List<Owner> owners) {
+        this.owners = owners;
+    }
+
     public void addOwner(Owner owner) {
         if (owner != null && !owners.contains(owner)) {
             this.owners.add(owner);

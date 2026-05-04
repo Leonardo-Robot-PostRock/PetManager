@@ -3,6 +3,8 @@ package ar.com.petmanager.persistence;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.domain.Cat;
 import ar.com.petmanager.domain.Dog;
+import ar.com.petmanager.domain.Owner;
+import ar.com.petmanager.domain.Sex;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -125,11 +127,43 @@ public class PetDAO implements DAO<Pet, Long> {
             );
         }
         pet.setId(rs.getLong("id"));
+        pet.setOwners(loadOwnersForPet(pet.getId()));
         try {
             pet.setStatus(ar.com.petmanager.domain.PetStatus.valueOf(rs.getString("status")));
         } catch (IllegalArgumentException | SQLException e) {
             // Si el status no existe, dejar default ACTIVA
         }
         return pet;
+    }
+
+    private List<Owner> loadOwnersForPet(long petId) {
+        List<Owner> owners = new ArrayList<>();
+        String sql = "SELECT p.* FROM persons p INNER JOIN owner_pet op ON p.dni = op.owner_dni WHERE op.pet_id = ? AND p.type = 'OWNER'";
+        try (Connection conn = dbConnector.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setLong(1, petId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Sex sex;
+                try {
+                    sex = Sex.valueOf(rs.getString("sex"));
+                } catch (IllegalArgumentException | SQLException e) {
+                    sex = Sex.MASCULINO;
+                }
+                Owner owner = new Owner(
+                        rs.getInt("dni"),
+                        rs.getString("name"),
+                        rs.getString("surname"),
+                        (int) rs.getLong("phone"),
+                        sex,
+                        rs.getString("street"),
+                        rs.getString("city")
+                );
+                owners.add(owner);
+            }
+        } catch (SQLException e) {
+            throw new PersistenceException("Error al cargar dueños del Pet", e);
+        }
+        return owners;
     }
 }
