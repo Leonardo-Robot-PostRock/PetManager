@@ -52,13 +52,13 @@ public class HomeUI extends BasePanel {
         JPanel contentWrapper = new JPanel();
         contentWrapper.setLayout(new BoxLayout(contentWrapper, BoxLayout.Y_AXIS));
         contentWrapper.setOpaque(false);
-        contentWrapper.setBorder(new EmptyBorder(UIConstants.PADDING_XLARGE, UIConstants.PADDING_XLARGE,
-                UIConstants.PADDING_MEDIUM, UIConstants.PADDING_XLARGE));
+        contentWrapper.setBorder(new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_XLARGE,
+                UIConstants.PADDING_SMALL, UIConstants.PADDING_XLARGE));
 
         contentWrapper.add(createWelcomeHeader());
-        contentWrapper.add(Box.createRigidArea(new Dimension(0, UIConstants.MARGIN_SECTION)));
+        contentWrapper.add(Box.createRigidArea(new Dimension(0, 15)));
         contentWrapper.add(createStatsPanel());
-        contentWrapper.add(Box.createRigidArea(new Dimension(0, UIConstants.MARGIN_SECTION)));
+        contentWrapper.add(Box.createRigidArea(new Dimension(0, 15)));
         contentWrapper.add(createQuickActionsPanel());
 
         add(contentWrapper, BorderLayout.CENTER);
@@ -95,20 +95,27 @@ public class HomeUI extends BasePanel {
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
         wrapper.setOpaque(false);
 
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.CENTER, UIConstants.PADDING_LARGE, UIConstants.PADDING_SMALL));
+        // Row 1: GridLayout evita el wrap que causaba superposición visual
+        JPanel row1 = new JPanel(new GridLayout(1, 5, UIConstants.PADDING_SMALL, 0));
         row1.setOpaque(false);
+        row1.setPreferredSize(new Dimension(0, UIConstants.STAT_CARD_SIZE.height));
+        row1.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIConstants.STAT_CARD_SIZE.height));
         row1.add(createStatCard("Total Mascotas", lblTotalMascotas, UIConstants.COLOR_ACCENT));
         row1.add(createStatCard("Perros", lblTotalPerros, UIConstants.COLOR_CARD_PETS));
         row1.add(createStatCard("Gatos", lblTotalGatos, UIConstants.COLOR_CARD_OWNER));
         row1.add(createStatCard("Dueños", lblTotalDuenos, UIConstants.COLOR_CARD_DONORS));
         row1.add(createStatCard("Veterinarias", lblTotalVets, UIConstants.COLOR_CARD_VETS));
 
-        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.CENTER, UIConstants.PADDING_LARGE, UIConstants.PADDING_SMALL));
+        // Row 2: FlowLayout centrado con 2 cards — no puede wrappear
+        JPanel row2 = new JPanel(new FlowLayout(FlowLayout.CENTER, UIConstants.PADDING_MEDIUM, 0));
         row2.setOpaque(false);
+        row2.setPreferredSize(new Dimension(0, UIConstants.STAT_CARD_SIZE.height));
+        row2.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIConstants.STAT_CARD_SIZE.height));
         row2.add(createStatCard("Perdidas", lblTotalPerdidas, UIConstants.COLOR_WARNING));
         row2.add(createStatCard("Fallecidas", lblTotalFallecidas, UIConstants.COLOR_ERROR));
 
         wrapper.add(row1);
+        wrapper.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
         wrapper.add(row2);
 
         return wrapper;
@@ -155,20 +162,20 @@ public class HomeUI extends BasePanel {
         JPanel panel = new JPanel(new GridLayout(2, 2, UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE));
         panel.setOpaque(false);
         panel.setBorder(new EmptyBorder(UIConstants.PADDING_MEDIUM, 0, UIConstants.PADDING_MEDIUM, 0));
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 280));
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 260));
 
         panel.add(createActionCard("Gestión de Clientes y Dueños",
                 "Administrá dueños, datos de contacto y mascotas asociadas",
-                UIConstants.COLOR_CARD_OWNER, "Dueños"));
+                UIConstants.COLOR_CARD_OWNER, "dueños"));
         panel.add(createActionCard("Ver Mascotas",
                 "Listado completo de mascotas. Filtros por tipo, búsqueda y detalle",
-                UIConstants.COLOR_CARD_PETS, "Mascotas"));
+                UIConstants.COLOR_CARD_PETS, "mascotas"));
         panel.add(createActionCard("Veterinarias",
                 "Registro y consulta de veterinarias disponibles",
-                UIConstants.COLOR_CARD_VETS, "Veterinarias"));
+                UIConstants.COLOR_CARD_VETS, "veterinarias"));
         panel.add(createActionCard("Gestión de Contacto con Donadores",
                 "Listado de donantes, datos de contacto y comunicación",
-                UIConstants.COLOR_CARD_DONORS, "Contactar Donantes"));
+                UIConstants.COLOR_CARD_DONORS, "donantes"));
 
         return panel;
     }

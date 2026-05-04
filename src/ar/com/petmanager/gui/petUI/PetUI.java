@@ -1,6 +1,7 @@
 package ar.com.petmanager.gui.petUI;
 
 import ar.com.petmanager.domain.Cat;
+import ar.com.petmanager.domain.Dog;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.gui.base.BasePanel;
 import ar.com.petmanager.gui.constants.UIConstants;
@@ -29,11 +30,15 @@ public class PetUI extends BasePanel {
     private DefaultTableModel tableModel;
     private JComboBox<String> cmbFilter;
 
+    private JButton btnViewDetail;
+    private JButton btnDelete;
+    private JButton btnAdd;
+
     public PetUI(PetService petService) {
         this.petService = petService;
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);
-        this.detailPanel = new PetDetailPanel(petService);
+        this.detailPanel = new PetDetailPanel(petService, () -> cardLayout.show(cards, "lista"));
 
         initializeComponents();
         configureLayout();
@@ -131,6 +136,10 @@ public class PetUI extends BasePanel {
         JButton btnDelete = createButton("Eliminar", UIConstants.COLOR_ERROR);
         JButton btnAdd = createButton("Agregar Mascota", UIConstants.COLOR_SUCCESS);
 
+        this.btnViewDetail = btnViewDetail;
+        this.btnDelete = btnDelete;
+        this.btnAdd = btnAdd;
+
         actionBar.add(btnAdd);
         actionBar.add(btnViewDetail);
         actionBar.add(btnDelete);
@@ -151,6 +160,10 @@ public class PetUI extends BasePanel {
 
     private void configureListeners() {
         cmbFilter.addActionListener(e -> filterPets());
+
+        btnAdd.addActionListener(e -> showAddPetDialog());
+        btnViewDetail.addActionListener(e -> showPetDetail());
+        btnDelete.addActionListener(e -> deletePet());
 
         tblPets.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -197,6 +210,67 @@ public class PetUI extends BasePanel {
         });
     }
 
+    private void deletePet() {
+        int row = tblPets.getSelectedRow();
+        if (row == -1) {
+            showError("Seleccioná una mascota de la tabla.");
+            return;
+        }
+        int confirm = JOptionPane.showConfirmDialog(this, UIConstants.MSG_CONFIRM_DELETE,
+                "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) return;
+
+        long petId = (long) tableModel.getValueAt(row, 0);
+        petService.deleteById((int) petId);
+        loadTableData();
+    }
+
+    private void showAddPetDialog() {
+        JPanel form = new JPanel(new GridLayout(0, 2, UIConstants.PADDING_SMALL, UIConstants.PADDING_SMALL));
+
+        JTextField txtName = new JTextField();
+        JComboBox<String> cmbType = new JComboBox<>(new String[]{"Perro", "Gato"});
+        JTextField txtAge = new JTextField();
+        JTextField txtWeight = new JTextField();
+        JTextField txtRace = new JTextField();
+        JCheckBox chkSick = new JCheckBox();
+        JTextArea txtDescription = new JTextArea(3, 20);
+        txtDescription.setLineWrap(true);
+
+        form.add(new JLabel("Nombre:"));        form.add(txtName);
+        form.add(new JLabel("Tipo:"));          form.add(cmbType);
+        form.add(new JLabel("Edad:"));          form.add(txtAge);
+        form.add(new JLabel("Peso (kg):"));     form.add(txtWeight);
+        form.add(new JLabel("Raza:"));          form.add(txtRace);
+        form.add(new JLabel("Enfermo:"));       form.add(chkSick);
+        form.add(new JLabel("Descripción:"));   form.add(new JScrollPane(txtDescription));
+
+        int result = JOptionPane.showConfirmDialog(this, form,
+                "Agregar Mascota", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result != JOptionPane.OK_OPTION) return;
+
+        try {
+            String name = txtName.getText().trim();
+            if (name.isEmpty()) { showError("El nombre es obligatorio."); return; }
+
+            int age = Integer.parseInt(txtAge.getText().trim());
+            double weight = Double.parseDouble(txtWeight.getText().trim());
+            String race = txtRace.getText().trim();
+            boolean sick = chkSick.isSelected();
+            String description = txtDescription.getText().trim();
+
+            Pet pet = "Perro".equals(cmbType.getSelectedItem())
+                    ? new Dog(name, age, weight, race, sick, description)
+                    : new Cat(name, age, weight, race, sick, description);
+
+            petService.add(pet);
+            loadTableData();
+        } catch (NumberFormatException ex) {
+            showError("Edad y peso deben ser números válidos.");
+        }
+    }
+
     private void showPetDetail() {
         int row = tblPets.getSelectedRow();
         if (row == -1) {
@@ -226,6 +300,8 @@ public class PetUI extends BasePanel {
         btn.setForeground(UIConstants.COLOR_WHITE);
         btn.setBorder(new EmptyBorder(6, 14, 6, 14));
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }

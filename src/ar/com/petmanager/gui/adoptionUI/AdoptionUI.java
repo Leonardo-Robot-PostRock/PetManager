@@ -200,6 +200,8 @@ public class AdoptionUI extends BasePanel {
         btn.setForeground(UIConstants.COLOR_WHITE);
         btn.setBorder(new EmptyBorder(10, 24, 10, 24));
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }

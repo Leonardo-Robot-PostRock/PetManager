@@ -163,6 +163,8 @@ public class OwnerUI extends BasePanel {
         btn.setForeground(UIConstants.COLOR_WHITE);
         btn.setBorder(new EmptyBorder(8, 16, 8, 16));
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }

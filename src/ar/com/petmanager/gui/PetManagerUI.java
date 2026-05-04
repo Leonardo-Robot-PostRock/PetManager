@@ -170,6 +170,8 @@ public class PetManagerUI extends JFrame {
         btn.setBackground(isActive ? UIConstants.COLOR_PRIMARY.brighter().brighter():Color.WHITE);
         btn.setBorder(new EmptyBorder(12, UIConstants.PADDING_LARGE, 12, UIConstants.PADDING_LARGE));
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setMaximumSize(new Dimension(UIConstants.SIDEBAR_WIDTH - 20, 45));

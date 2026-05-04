@@ -41,9 +41,9 @@ public class PetDetailPanel extends BasePanel {
 
     private final Runnable onBackToList;
 
-    public PetDetailPanel(PetService petService) {
+    public PetDetailPanel(PetService petService, Runnable onBack) {
         this.petService = petService;
-        this.onBackToList = this::navigateBack;
+        this.onBackToList = onBack;
 
         initializeComponents();
         configureLayout();
@@ -260,7 +260,7 @@ public class PetDetailPanel extends BasePanel {
     }
 
     private void navigateBack() {
-        this.setVisible(false);
+        onBackToList.run();
     }
 
     private JButton createButton(String text, Color bgColor) {
@@ -270,6 +270,8 @@ public class PetDetailPanel extends BasePanel {
         btn.setForeground(UIConstants.COLOR_WHITE);
         btn.setBorder(new EmptyBorder(8, 18, 8, 18));
         btn.setFocusPainted(false);
+        btn.setOpaque(true);
+        btn.setContentAreaFilled(true);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
