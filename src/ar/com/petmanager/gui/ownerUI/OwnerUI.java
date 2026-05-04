@@ -229,9 +229,14 @@ public class OwnerUI extends BasePanel {
         btnClear.addActionListener(e -> clearForm());
 
         tblOwners.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && tblOwners.getSelectedRow() != -1) {
+            if (!e.getValueIsAdjusting()) {
                 int row = tblOwners.getSelectedRow();
-                fillFormFromRow(row);
+                if (row != -1) {
+                    fillFormFromRow(row);
+                } else {
+                    btnSave.setEnabled(true);
+                    txtDni.setEditable(true);
+                }
             }
         });
     }
@@ -261,6 +266,8 @@ public class OwnerUI extends BasePanel {
             clearForm();
         } catch (NumberFormatException ex) {
             showError("DNI y Teléfono deben ser números válidos.");
+        } catch (RuntimeException ex) {
+            showError("Error al guardar: " + ex.getMessage());
         }
     }
 
@@ -294,6 +301,8 @@ public class OwnerUI extends BasePanel {
             info("Dueño actualizado exitosamente.");
         } catch (NumberFormatException ex) {
             showError("Teléfono debe ser un número válido.");
+        } catch (RuntimeException ex) {
+            showError("Error al actualizar: " + ex.getMessage());
         }
     }
 
@@ -351,11 +360,13 @@ public class OwnerUI extends BasePanel {
                     owner.getPhone(), direccion, vetName
             });
         }
+        tblOwners.clearSelection();
         loadVets();
     }
 
     private void loadVets() {
         cmbPreferredVet.removeAllItems();
+        cmbPreferredVet.addItem(null);   // opción "sin veterinaria"
         List<Vet> vets = vetService.getAll();
         for (Vet vet : vets) {
             cmbPreferredVet.addItem(vet);
