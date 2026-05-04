@@ -24,6 +24,7 @@ public class HomeUI extends BasePanel {
     private JLabel lblTotalVets;
     private JLabel lblTotalPerdidas;
     private JLabel lblTotalFallecidas;
+    private JLabel lblTotalAdopcion;
 
     private final Consumer<String> onNavigate;
 
@@ -44,6 +45,7 @@ public class HomeUI extends BasePanel {
         lblTotalVets = new JLabel("0");
         lblTotalPerdidas = new JLabel("0");
         lblTotalFallecidas = new JLabel("0");
+        lblTotalAdopcion = new JLabel("0");
     }
 
     private void configureLayout() {
@@ -113,6 +115,7 @@ public class HomeUI extends BasePanel {
         row2.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIConstants.STAT_CARD_SIZE.height));
         row2.add(createStatCard("Perdidas", lblTotalPerdidas, UIConstants.COLOR_WARNING));
         row2.add(createStatCard("Fallecidas", lblTotalFallecidas, UIConstants.COLOR_ERROR));
+        row2.add(createStatCard("En Adopción", lblTotalAdopcion, UIConstants.COLOR_CARD_PETS));
 
         wrapper.add(row1);
         wrapper.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
@@ -229,7 +232,7 @@ public class HomeUI extends BasePanel {
     /**
      * Actualiza los valores de estadísticas en el dashboard.
      */
-    public void updateStats(int totalMascotas, int totalPerros, int totalGatos, int totalDuenos, int totalVets, int perdidas, int fallecidas) {
+    public void updateStats(int totalMascotas, int totalPerros, int totalGatos, int totalDuenos, int totalVets, int perdidas, int fallecidas, int adopcion) {
         lblTotalMascotas.setText(String.valueOf(totalMascotas));
         lblTotalPerros.setText(String.valueOf(totalPerros));
         lblTotalGatos.setText(String.valueOf(totalGatos));
@@ -237,5 +240,6 @@ public class HomeUI extends BasePanel {
         lblTotalVets.setText(String.valueOf(totalVets));
         lblTotalPerdidas.setText(String.valueOf(perdidas));
         lblTotalFallecidas.setText(String.valueOf(fallecidas));
+        lblTotalAdopcion.setText(String.valueOf(adopcion));
     }
 }

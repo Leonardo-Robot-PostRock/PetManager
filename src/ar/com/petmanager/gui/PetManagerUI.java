@@ -230,9 +230,10 @@ public class PetManagerUI extends JFrame {
                 long cats = pets.stream().filter(p -> p instanceof ar.com.petmanager.domain.Cat).count();
                 long perdidas = pets.stream().filter(p -> p.getStatus() == ar.com.petmanager.domain.PetStatus.PERDIDA).count();
                 long fallecidas = pets.stream().filter(p -> p.getStatus() == ar.com.petmanager.domain.PetStatus.FALLECIDA).count();
+                long adopcion = pets.stream().filter(p -> p.getOwners() == null || p.getOwners().isEmpty()).count();
                 homePanel.updateStats(pets.size(), (int) dogs, (int) cats,
                         ownerService.getAll().size(), vetService.getAll().size(),
-                        (int) perdidas, (int) fallecidas);
+                        (int) perdidas, (int) fallecidas, (int) adopcion);
                 break;
             case "mascotas":
                 petPanel.showList();
