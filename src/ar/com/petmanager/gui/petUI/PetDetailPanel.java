@@ -33,7 +33,6 @@ public class PetDetailPanel extends BasePanel {
     private JTextField txtWeight;
     private JLabel lblRace;
     private JCheckBox chkSick;
-    private JLabel lblStatus;
     private JComboBox<PetStatus> cmbStatus;
     private JTextArea txtDescription;
     private JLabel lblOwners;
@@ -71,11 +70,10 @@ public class PetDetailPanel extends BasePanel {
         txtWeight.setFont(UIConstants.FONT_BODY);
         txtWeight.setPreferredSize(new Dimension(120, 28));
         lblRace = new JLabel();
-        chkSick = new JCheckBox();
+        chkSick = new JCheckBox("Está enfermo/a");
         chkSick.setEnabled(false);
         chkSick.setFont(UIConstants.FONT_BODY);
         chkSick.setOpaque(false);
-        lblStatus = new JLabel();
         cmbStatus = new JComboBox<>(PetStatus.values());
 
         txtDescription = new JTextArea();
@@ -165,15 +163,33 @@ public class PetDetailPanel extends BasePanel {
         panel.add(createTextFieldRow("Edad:", txtAge));
         panel.add(createTextFieldRow("Peso:", txtWeight));
         panel.add(createInfoRow("Raza:", lblRace));
-        panel.add(createCheckRow("Salud:", chkSick));
+        panel.add(createCheckRow("Condición:", chkSick));
         panel.add(createComboRow("Estatus:", cmbStatus));
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
 
+        JPanel ownersPanel = new JPanel();
+        ownersPanel.setLayout(new BoxLayout(ownersPanel, BoxLayout.Y_AXIS));
+        ownersPanel.setBackground(new Color(235, 225, 250));
+        ownersPanel.setOpaque(true);
+        ownersPanel.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_CARD_OWNER, 1, true),
+                new EmptyBorder(UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM,
+                        UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM)
+        ));
+        ownersPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ownersPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+
         JLabel lblOwnerTitle = new JLabel("Dueños:");
         lblOwnerTitle.setFont(UIConstants.FONT_BODY_BOLD);
-        lblOwnerTitle.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
-        panel.add(lblOwnerTitle);
-        panel.add(lblOwners);
+        lblOwnerTitle.setForeground(UIConstants.COLOR_CARD_OWNER);
+        lblOwnerTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        lblOwners.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        lblOwners.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ownersPanel.add(lblOwnerTitle);
+        ownersPanel.add(Box.createRigidArea(new Dimension(0, 2)));
+        ownersPanel.add(lblOwners);
+
+        panel.add(ownersPanel);
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
 
         JLabel lblDesc = new JLabel("Descripción:");
@@ -253,7 +269,6 @@ public class PetDetailPanel extends BasePanel {
 
         row.add(lbl);
         row.add(combo);
-        row.add(lblStatus);
 
         return row;
     }
@@ -265,28 +280,14 @@ public class PetDetailPanel extends BasePanel {
         this.currentPet = pet;
 
         lblName.setText(pet.getName());
-        lblType.setText(pet instanceof ar.com.petmanager.domain.Dog ? "Perro" : "Gato");
+        lblType.setText(pet instanceof ar.com.petmanager.domain.Dog ? "Perro":"Gato");
         txtAge.setText(pet.getAge());
         txtWeight.setText(String.format("%.1f", pet.getWeight()));
         lblRace.setText(pet.getRace());
         chkSick.setSelected(pet.isSick());
-        lblStatus.setText(pet.getStatus() != null ? pet.getStatus().getLabel() : "Activa");
-        cmbStatus.setSelectedItem(pet.getStatus() != null ? pet.getStatus() : PetStatus.ACTIVA);
+        cmbStatus.setSelectedItem(pet.getStatus()!=null ? pet.getStatus():PetStatus.ACTIVA);
         txtDescription.setText(pet.getDescription());
-
-        // Dueños con prefijo según sexo
-        List<Owner> owners = pet.getOwners();
-        if (owners == null || owners.isEmpty()) {
-            lblOwners.setText("Sin dueño asignado.");
-        } else {
-            StringBuilder sb = new StringBuilder("<html>");
-            for (Owner o : owners) {
-                String prefix = o.getSex() == Sex.FEMENINO ? "Mamá" : "Papá";
-                sb.append(prefix).append(": ").append(o.getName()).append(" ").append(o.getSurname()).append("<br>");
-            }
-            sb.append("</html>");
-            lblOwners.setText(sb.toString());
-        }
+        refreshOwnersLabel();
 
         updateAvatar(pet);
         setEditMode(false);
@@ -297,7 +298,7 @@ public class PetDetailPanel extends BasePanel {
         String initials = pet.getName();
         Color bgColor = pet instanceof ar.com.petmanager.domain.Dog
                 ? UIConstants.COLOR_CARD_PETS
-                : UIConstants.COLOR_CARD_OWNER;
+                :UIConstants.COLOR_CARD_OWNER;
 
         avatarPanel.add(ar.com.petmanager.gui.utils.ImageUtils.createAvatarPlaceholder(initials, 140, bgColor));
         avatarPanel.revalidate();
@@ -310,10 +311,10 @@ public class PetDetailPanel extends BasePanel {
         btnEdit.addActionListener(e -> setEditMode(true));
 
         btnCancel.addActionListener(e -> {
-            if (currentPet != null) {
+            if (currentPet!=null) {
                 // Recargar desde BD para revertir cambios
                 Pet fresh = petService.getById((int) currentPet.getId());
-                if (fresh != null) {
+                if (fresh!=null) {
                     currentPet = fresh;
                 }
                 setEditMode(false);
@@ -321,7 +322,7 @@ public class PetDetailPanel extends BasePanel {
         });
 
         btnSave.addActionListener(e -> {
-            if (currentPet == null) return;
+            if (currentPet==null) return;
             try {
                 currentPet.setAge(txtAge.getText().trim());
                 String weightText = txtWeight.getText().trim().replace(',', '.');
@@ -330,7 +331,6 @@ public class PetDetailPanel extends BasePanel {
                 currentPet.setStatus((PetStatus) cmbStatus.getSelectedItem());
 
                 petService.update(currentPet);
-                lblStatus.setText(currentPet.getStatus().getLabel());
 
                 setEditMode(false);
                 JOptionPane.showMessageDialog(this, "Mascota actualizada correctamente.");
@@ -342,10 +342,10 @@ public class PetDetailPanel extends BasePanel {
         });
 
         btnDelete.addActionListener(e -> {
-            if (currentPet == null) return;
+            if (currentPet==null) return;
             int confirm = JOptionPane.showConfirmDialog(this, UIConstants.MSG_CONFIRM_DELETE,
                     "Confirmar", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
+            if (confirm==JOptionPane.YES_OPTION) {
                 petService.deleteById((int) currentPet.getId());
                 JOptionPane.showMessageDialog(this, UIConstants.MSG_DELETE_SUCCESS);
                 navigateBack();
@@ -360,19 +360,19 @@ public class PetDetailPanel extends BasePanel {
             if (confirm == JOptionPane.YES_OPTION) {
                 petService.removeAllOwnersFromPet(currentPet.getId());
                 currentPet.setOwners(new ArrayList<>());
-                lblOwners.setText("Sin dueño asignado.");
+                refreshOwnersLabel();
                 JOptionPane.showMessageDialog(this, "Mascota disponible para adopción.");
             }
         });
 
         btnAddOwner.addActionListener(e -> {
-            if (currentPet == null) return;
+            if (currentPet==null) return;
             // Filtrar owners que ya tienen esta mascota
             List<Owner> allOwners = ownerService.getAll();
             List<Owner> currentOwners = currentPet.getOwners();
             List<Owner> available = new ArrayList<>();
             for (Owner o : allOwners) {
-                if (currentOwners != null && currentOwners.contains(o)) continue;
+                if (currentOwners!=null && currentOwners.contains(o)) continue;
                 available.add(o);
             }
             if (available.isEmpty()) {
@@ -384,9 +384,10 @@ public class PetDetailPanel extends BasePanel {
 
             int result = JOptionPane.showConfirmDialog(this, cmb,
                     "Agregar Dueño", JOptionPane.OK_CANCEL_OPTION);
-            if (result == JOptionPane.OK_OPTION) {
+            if (result==JOptionPane.OK_OPTION) {
                 Owner selected = (Owner) cmb.getSelectedItem();
                 petService.addOwner(selected, currentPet);
+                refreshOwnersLabel();
                 JOptionPane.showMessageDialog(this,
                         "Dueño asignado correctamente.");
             }
@@ -409,7 +410,7 @@ public class PetDetailPanel extends BasePanel {
         btnAdopt.setVisible(!edit);
         btnDelete.setVisible(!edit);
 
-        if (!edit && currentPet != null) {
+        if (!edit && currentPet!=null) {
             // Refrescar campos por si hubo cambios cancelados
             txtAge.setText(currentPet.getAge());
             txtWeight.setText(String.format("%.1f", currentPet.getWeight()));
@@ -421,6 +422,22 @@ public class PetDetailPanel extends BasePanel {
 
     private void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void refreshOwnersLabel() {
+        if (currentPet == null) return;
+        List<Owner> owners = currentPet.getOwners();
+        if (owners == null || owners.isEmpty()) {
+            lblOwners.setText("Sin dueño asignado.");
+        } else {
+            StringBuilder sb = new StringBuilder("<html>");
+            for (Owner o : owners) {
+                String prefix = o.getSex() == Sex.FEMENINO ? "Mamá" : "Papá";
+                sb.append(prefix).append(": ").append(o.getName()).append(" ").append(o.getSurname()).append("<br>");
+            }
+            sb.append("</html>");
+            lblOwners.setText(sb.toString());
+        }
     }
 
     private void navigateBack() {
