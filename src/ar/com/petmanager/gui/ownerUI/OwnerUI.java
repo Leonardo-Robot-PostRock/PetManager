@@ -117,8 +117,8 @@ public class OwnerUI extends BasePanel {
         addField(fieldsPanel, gbc, "Teléfono:", txtPhone, 0, 1);
         addField(fieldsPanel, gbc, "Calle:", txtStreet, 1, 1);
         addField(fieldsPanel, gbc, "Ciudad:", txtCity, 2, 1);
-        addField(fieldsPanel, gbc, "Veterinaria Preferida:", cmbPreferredVet, 0, 2);
-        addField(fieldsPanel, gbc, "Sexo:", cmbSex, 0, 3);
+        addField(fieldsPanel, gbc, "Sexo:", cmbSex, 0, 2);
+        addField(fieldsPanel, gbc, "Veterinaria Preferida:", cmbPreferredVet, 0, 3);
 
         // Botones
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_SMALL, 0));
