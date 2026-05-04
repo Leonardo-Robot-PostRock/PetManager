@@ -8,11 +8,11 @@ public class Cat extends Pet {
         super(name);
     }
 
-    public Cat(String name, int age, double weight, String race) {
+    public Cat(String name, String age, double weight, String race) {
         super(name, age, weight, race);
     }
 
-    public Cat(String name, int age, double weight, String race, boolean isSick, String description) {
+    public Cat(String name, String age, double weight, String race, boolean isSick, String description) {
         super(name, age, weight, race, isSick, description);
     }
 
@@ -32,12 +32,12 @@ public class Cat extends Pet {
     }
 
     @Override
-    public int getAge() {
+    public String getAge() {
         return super.getAge();
     }
 
     @Override
-    public void setAge(int age) {
+    public void setAge(String age) {
         super.setAge(age);
     }
 

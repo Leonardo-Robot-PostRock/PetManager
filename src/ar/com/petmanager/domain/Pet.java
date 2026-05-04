@@ -5,7 +5,7 @@ import java.util.List;
 public abstract class Pet {
     private long id;
     private String name;
-    private int age;
+    private String age;
     private List<Owner> owners;
     private double weight;
     private String race;
@@ -24,7 +24,7 @@ public abstract class Pet {
         this.name = name;
     }
 
-    public Pet(String name, int age, double weight, String race) {
+    public Pet(String name, String age, double weight, String race) {
         this();
         this.name = name;
         this.age = age;
@@ -32,7 +32,7 @@ public abstract class Pet {
         this.race = race;
     }
 
-    public Pet(String name, int age, double weight, String race, boolean isSick, String description) {
+    public Pet(String name, String age, double weight, String race, boolean isSick, String description) {
         this();
         this.name = name;
         this.age = age;
@@ -58,11 +58,11 @@ public abstract class Pet {
         this.name = name;
     }
 
-    public int getAge() {
+    public String getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(String age) {
         this.age = age;
     }
 
