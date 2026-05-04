@@ -22,7 +22,7 @@ public class PetDAO implements DAO<Pet, Long> {
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, pet.getName());
-            stmt.setInt(2, pet.getAge());
+            stmt.setString(2, pet.getAge());
             stmt.setDouble(3, pet.getWeight());
             stmt.setString(4, pet.getRace());
             stmt.setBoolean(5, pet.isSick());
@@ -45,7 +45,7 @@ public class PetDAO implements DAO<Pet, Long> {
         try (Connection conn = dbConnector.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, pet.getName());
-            stmt.setInt(2, pet.getAge());
+            stmt.setString(2, pet.getAge());
             stmt.setDouble(3, pet.getWeight());
             stmt.setString(4, pet.getRace());
             stmt.setBoolean(5, pet.isSick());
@@ -108,7 +108,7 @@ public class PetDAO implements DAO<Pet, Long> {
         if ("DOG".equals(type)) {
             pet = new Dog(
                     rs.getString("name"),
-                    rs.getInt("age"),
+                    rs.getString("age"),
                     rs.getDouble("weight"),
                     rs.getString("race"),
                     rs.getBoolean("is_sick"),
@@ -117,7 +117,7 @@ public class PetDAO implements DAO<Pet, Long> {
         } else {
             pet = new Cat(
                     rs.getString("name"),
-                    rs.getInt("age"),
+                    rs.getString("age"),
                     rs.getDouble("weight"),
                     rs.getString("race"),
                     rs.getBoolean("is_sick"),

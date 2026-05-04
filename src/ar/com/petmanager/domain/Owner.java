@@ -91,6 +91,6 @@ public class Owner extends Person {
 
     @Override
     public String toString() {
-        return super.toString();
+        return getName() + " " + getSurname() + " (DNI " + getDni() + ")";
     }
 }
