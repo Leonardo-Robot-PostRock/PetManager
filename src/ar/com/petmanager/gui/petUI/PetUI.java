@@ -42,7 +42,7 @@ public class PetUI extends BasePanel {
         this.ownerService = ownerService;
         this.cardLayout = new CardLayout();
         this.cards = new JPanel(cardLayout);
-        this.detailPanel = new PetDetailPanel(petService, () -> cardLayout.show(cards, "lista"));
+        this.detailPanel = new PetDetailPanel(petService, ownerService, () -> cardLayout.show(cards, "lista"));
 
         initializeComponents();
         configureLayout();

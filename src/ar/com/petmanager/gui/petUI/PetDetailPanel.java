@@ -1,10 +1,11 @@
 package ar.com.petmanager.gui.petUI;
 
-import ar.com.petmanager.domain.Cat;
+import ar.com.petmanager.domain.Owner;
 import ar.com.petmanager.domain.Pet;
 import ar.com.petmanager.domain.PetStatus;
 import ar.com.petmanager.gui.base.BasePanel;
 import ar.com.petmanager.gui.constants.UIConstants;
+import ar.com.petmanager.service.OwnerService;
 import ar.com.petmanager.service.PetService;
 
 import javax.swing.*;
@@ -21,6 +22,7 @@ import java.util.List;
 public class PetDetailPanel extends BasePanel {
 
     private final PetService petService;
+    private final OwnerService ownerService;
     private Pet currentPet;
 
     private JLabel lblName;
@@ -36,14 +38,17 @@ public class PetDetailPanel extends BasePanel {
     private JPanel avatarPanel;
     private JButton btnEdit;
     private JButton btnSave;
+    private JButton btnCancel;
+    private JButton btnAddOwner;
     private JButton btnDelete;
     private JButton btnAdopt;
     private JButton btnBack;
 
     private final Runnable onBackToList;
 
-    public PetDetailPanel(PetService petService, Runnable onBack) {
+    public PetDetailPanel(PetService petService, OwnerService ownerService, Runnable onBack) {
         this.petService = petService;
+        this.ownerService = ownerService;
         this.onBackToList = onBack;
 
         initializeComponents();
@@ -84,6 +89,10 @@ public class PetDetailPanel extends BasePanel {
         btnEdit = createButton("Editar", UIConstants.COLOR_ACCENT);
         btnSave = createButton("Guardar", UIConstants.COLOR_SUCCESS);
         btnSave.setVisible(false);
+        btnCancel = createButton("Cancelar", UIConstants.COLOR_TEXT_SECONDARY);
+        btnCancel.setVisible(false);
+        btnAddOwner = createButton("+ Dueño", UIConstants.COLOR_CARD_OWNER);
+        btnAddOwner.setVisible(false);
         btnDelete = createButton("Eliminar", UIConstants.COLOR_ERROR);
         btnAdopt = createButton("Dar en Adopción", UIConstants.COLOR_CARD_OWNER);
         btnBack = createButton("← Volver", UIConstants.COLOR_TEXT_SECONDARY);
@@ -112,6 +121,8 @@ public class PetDetailPanel extends BasePanel {
         actionPanel.setBorder(new EmptyBorder(UIConstants.PADDING_LARGE, 0, 0, 0));
         actionPanel.add(btnEdit);
         actionPanel.add(btnSave);
+        actionPanel.add(btnCancel);
+        actionPanel.add(btnAddOwner);
         actionPanel.add(btnAdopt);
         actionPanel.add(btnDelete);
 
@@ -270,6 +281,17 @@ public class PetDetailPanel extends BasePanel {
 
         btnEdit.addActionListener(e -> setEditMode(true));
 
+        btnCancel.addActionListener(e -> {
+            if (currentPet != null) {
+                // Recargar desde BD para revertir cambios
+                Pet fresh = petService.getById((int) currentPet.getId());
+                if (fresh != null) {
+                    currentPet = fresh;
+                }
+                setEditMode(false);
+            }
+        });
+
         btnSave.addActionListener(e -> {
             if (currentPet == null) return;
             try {
@@ -321,6 +343,8 @@ public class PetDetailPanel extends BasePanel {
 
         btnEdit.setVisible(!edit);
         btnSave.setVisible(edit);
+        btnCancel.setVisible(edit);
+        btnAddOwner.setVisible(edit);
         btnAdopt.setVisible(!edit);
         btnDelete.setVisible(!edit);
 
