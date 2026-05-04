@@ -81,82 +81,56 @@ public class VetsUI extends BasePanel {
     }
 
     private JPanel createFormPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new BorderLayout(0, UIConstants.PADDING_MEDIUM));
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(UIConstants.COLOR_BORDER, 1, true),
-                new EmptyBorder(UIConstants.PADDING_MEDIUM, UIConstants.PADDING_MEDIUM,
-                        UIConstants.PADDING_MEDIUM, UIConstants.PADDING_MEDIUM)
+                new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
+                        UIConstants.PADDING_MEDIUM, UIConstants.PADDING_LARGE)
         ));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(UIConstants.PADDING_SMALL, UIConstants.PADDING_SMALL, UIConstants.PADDING_SMALL, UIConstants.PADDING_SMALL);
-        gbc.anchor = GridBagConstraints.WEST;
+        // 4 filas × 2 columnas (label | input) — cada par en su propia fila, apilados verticalmente
+        JPanel inputsGrid = new JPanel(new GridLayout(4, 2, UIConstants.PADDING_MEDIUM, UIConstants.PADDING_SMALL));
+        inputsGrid.setOpaque(false);
+        inputsGrid.add(createInputLabel("Nombre:"));
+        inputsGrid.add(txtName);
+        inputsGrid.add(createInputLabel("Teléfono:"));
+        inputsGrid.add(txtPhone);
+        inputsGrid.add(createInputLabel("Calle:"));
+        inputsGrid.add(txtStreet);
+        inputsGrid.add(createInputLabel("Ciudad:"));
+        inputsGrid.add(txtCity);
 
-        // Fila 1: Nombre y Teléfono
-        addFormField(panel, gbc, "Nombre:", txtName, 0, 0, 0.3);
-        addFormField(panel, gbc, "Teléfono:", txtPhone, 1, 0, 0.3);
+        // FlowLayout(LEFT) evita que GridLayout se estire al ancho completo del panel
+        JPanel inputsWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        inputsWrapper.setOpaque(false);
+        inputsWrapper.add(inputsGrid);
 
-        // Botones
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_SMALL, 0));
+        // Botones alineados a la izquierda, debajo de los inputs
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
         buttonPanel.setOpaque(false);
         buttonPanel.add(btnSave);
         buttonPanel.add(btnUpdate);
         buttonPanel.add(btnDelete);
         buttonPanel.add(btnClear);
 
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.weightx = 0.4;
-        panel.add(buttonPanel, gbc);
-
-        // Fila 2: Calle y Ciudad
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.weightx = 0;
-        JLabel lblStreet = new JLabel("Calle:");
-        lblStreet.setFont(UIConstants.FONT_BODY_BOLD);
-        panel.add(lblStreet, gbc);
-
-        gbc.gridx = 1;
-        gbc.weightx = 0.3;
-        txtStreet.setPreferredSize(new Dimension(180, 30));
-        panel.add(txtStreet, gbc);
-
-        gbc.gridx = 2;
-        gbc.weightx = 0;
-        JLabel lblCity = new JLabel("Ciudad:");
-        lblCity.setFont(UIConstants.FONT_BODY_BOLD);
-        panel.add(lblCity, gbc);
-
-        gbc.gridx = 3;
-        gbc.weightx = 0.3;
-        txtCity.setPreferredSize(new Dimension(180, 30));
-        panel.add(txtCity, gbc);
+        panel.add(inputsWrapper, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
 
         return panel;
     }
 
-    private void addFormField(JPanel panel, GridBagConstraints gbc, String label, JTextField field, int col, int row, double weightx) {
-        gbc.gridx = col * 2;
-        gbc.gridy = row;
-        gbc.weightx = 0;
-        JLabel lbl = new JLabel(label);
+    private JLabel createInputLabel(String text) {
+        JLabel lbl = new JLabel(text);
         lbl.setFont(UIConstants.FONT_BODY_BOLD);
         lbl.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
-        panel.add(lbl, gbc);
-
-        gbc.gridx = col * 2 + 1;
-        gbc.weightx = weightx;
-        field.setPreferredSize(new Dimension(180, 30));
-        field.setFont(UIConstants.FONT_BODY);
-        panel.add(field, gbc);
+        return lbl;
     }
 
     private JTextField createTextField() {
         JTextField tf = new JTextField();
         tf.setFont(UIConstants.FONT_BODY);
+        tf.setPreferredSize(new Dimension(180, 32));
         tf.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(UIConstants.COLOR_BORDER, 1, true),
                 new EmptyBorder(4, 8, 4, 8)));
