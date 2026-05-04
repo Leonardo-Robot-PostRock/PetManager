@@ -3,7 +3,7 @@ package ar.com.petmanager.domain;
 import java.util.List;
 
 public abstract class Pet {
-    private final long id;
+    private long id;
     private String name;
     private int age;
     private List<Owner> owners;
@@ -44,6 +44,10 @@ public abstract class Pet {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
