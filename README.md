@@ -8,7 +8,7 @@ Permite administrar dueños, mascotas, veterinarias y donantes, con persistencia
 
 - **Java 17** (Zulu JDK)
 - **MySQL 8.x** corriendo en `localhost:3306`
-- MySQL Connector/J (`mysql-connector-j-*.jar`) en el classpath
+- MySQL Connector/J `8.2.0` — incluido en `lib/mysql-connector-j-8.2.0.jar`
 
 ## Relaciones OOP implementadas
 
@@ -60,14 +60,14 @@ Editá `resources/database.properties` con tu usuario y contraseña de MySQL.
 ### Desde IntelliJ IDEA
 
 1. Abrí el proyecto como módulo IntelliJ (`.iml`)
-2. Agregá `mysql-connector-j-*.jar` como librería del módulo
-3. Corré `PetManagerMain.java` o `PetManagerUI.java`
+2. El JAR de MySQL Connector/J ya está en `lib/` — IntelliJ lo detecta automáticamente vía el `.iml`
+3. Corré `PetManagerMain.java`
 
 ### Desde terminal
 
 ```bash
 # 1. Compilar
-javac -cp "lib/mysql-connector-j-8.0.33.jar:." -d out \
+javac -cp "lib/mysql-connector-j-8.2.0.jar:." -d out \
     src/ar/com/petmanager/**/*.java
 
 # 2. Copiar recursos al directorio de salida
@@ -75,7 +75,7 @@ cp -r src/ar/com/petmanager/assets out/ar/com/petmanager/
 cp resources/database.properties out/
 
 # 3. Ejecutar (out + resources en el classpath)
-java -cp "out:lib/mysql-connector-j-8.0.33.jar" \
+java -cp "out:lib/mysql-connector-j-8.2.0.jar" \
     ar.com.petmanager.presentation.PetManagerMain
 ```
 
@@ -85,6 +85,8 @@ java -cp "out:lib/mysql-connector-j-8.0.33.jar" \
 
 ```
 PetManager/
+├── lib/
+│   └── mysql-connector-j-8.2.0.jar  # Driver JDBC incluido en el repo
 ├── resources/
 │   ├── database.properties      # Configuración de conexión JDBC
 │   └── schema.sql               # DDL para MySQL
