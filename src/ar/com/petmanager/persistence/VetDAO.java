@@ -26,7 +26,7 @@ public class VetDAO implements DAO<Vet, Long> {
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
-                vet.getClass(); // dummy to use vet
+                vet.setIdVet(rs.getLong(1));
             }
         } catch (SQLException e) {
             throw new PersistenceException("Error al crear Vet", e);
@@ -94,11 +94,13 @@ public class VetDAO implements DAO<Vet, Long> {
     }
 
     private Vet mapResultSetToVet(ResultSet rs) throws SQLException {
-        return new Vet(
+        Vet vet = new Vet(
                 rs.getString("name"),
                 rs.getInt("phone"),
                 rs.getString("street"),
                 rs.getString("city")
         );
+        vet.setIdVet(rs.getLong("id_vet"));
+        return vet;
     }
 }
