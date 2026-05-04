@@ -1,92 +1,392 @@
 package ar.com.petmanager.gui.ownerUI;
 
 import ar.com.petmanager.domain.Owner;
-import ar.com.petmanager.service.OwnerServiceImpl;
-import ar.com.petmanager.service.VetServiceImpl;
+import ar.com.petmanager.domain.Vet;
+import ar.com.petmanager.gui.base.BasePanel;
+import ar.com.petmanager.gui.constants.UIConstants;
+import ar.com.petmanager.service.OwnerService;
+import ar.com.petmanager.service.VetService;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.util.List;
 
-public class OwnerUI extends JPanel {
+/**
+ * Panel de Gestión de Clientes y Dueños.
+ * Permite agregar, editar y eliminar dueños, asignar mascotas
+ * y vincular veterinarias preferidas.
+ */
+public class OwnerUI extends BasePanel {
 
-    private CardLayout cardLayout;
-    private JPanel cards;
-    private OwnerTableManager ownerTableManager;
-    private OwnerDetailPanel ownerDetailPanel;
-    private final OwnerServiceImpl ownerService;
-    private final VetServiceImpl vetService;
+    private final OwnerService ownerService;
+    private final VetService vetService;
 
-    public OwnerUI(OwnerServiceImpl ownerService, VetServiceImpl vetService) {
+    // Formulario
+    private JTextField txtDni;
+    private JTextField txtName;
+    private JTextField txtSurname;
+    private JTextField txtPhone;
+    private JTextField txtStreet;
+    private JTextField txtCity;
+    private JComboBox<Vet> cmbPreferredVet;
+
+    // Tabla
+    private JTable tblOwners;
+    private DefaultTableModel tableModel;
+
+    private JButton btnSave;
+    private JButton btnUpdate;
+    private JButton btnDelete;
+    private JButton btnClear;
+
+    public OwnerUI(OwnerService ownerService, VetService vetService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
-
         initializeComponents();
         configureLayout();
         configureListeners();
-
-        updateTableData();
+        loadTableData();
     }
 
     private void initializeComponents() {
-        cardLayout = new CardLayout();
-        cards = new JPanel(cardLayout);
+        txtDni = createTextField();
+        txtName = createTextField();
+        txtSurname = createTextField();
+        txtPhone = createTextField();
+        txtStreet = createTextField();
+        txtCity = createTextField();
+        cmbPreferredVet = new JComboBox<>();
 
-        ownerTableManager = new OwnerTableManager(ownerService);
-        OwnerFormPanel ownerFormPanel = new OwnerFormPanel(ownerService, vetService);
-        ownerDetailPanel = new OwnerDetailPanel(ownerService, vetService);
+        btnSave = createButton("Guardar", UIConstants.COLOR_SUCCESS);
+        btnUpdate = createButton("Actualizar", UIConstants.COLOR_ACCENT);
+        btnDelete = createButton("Eliminar", UIConstants.COLOR_ERROR);
+        btnClear = createButton("Limpiar", UIConstants.COLOR_TEXT_SECONDARY);
 
-        cards.add(ownerFormPanel, "Agregar Dueño");
-        cards.add(ownerTableManager, "Lista de Dueños");
-        cards.add(ownerDetailPanel, "Detalle del Dueño");
+        tblOwners = new JTable();
+        setupTable();
     }
 
     private void configureLayout() {
         setLayout(new BorderLayout());
-        add(createNavigationPanel(), BorderLayout.NORTH);
-        add(cards, BorderLayout.CENTER);
+
+        JPanel mainPanel = new JPanel(new BorderLayout(UIConstants.PADDING_LARGE, 0));
+        mainPanel.setOpaque(false);
+        mainPanel.setBorder(new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
+                UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE));
+
+        mainPanel.add(createFormPanel(), BorderLayout.NORTH);
+        mainPanel.add(createTablePanel(), BorderLayout.CENTER);
+
+        add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel createFormPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
+                new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
+                        UIConstants.PADDING_MEDIUM, UIConstants.PADDING_LARGE)
+        ));
+
+        // Título
+        JLabel lblTitle = new JLabel("Datos del Dueño");
+        lblTitle.setFont(UIConstants.FONT_SUBTITLE);
+        lblTitle.setForeground(UIConstants.COLOR_CARD_OWNER);
+
+        // Panel de campos
+        JPanel fieldsPanel = new JPanel(new GridBagLayout());
+        fieldsPanel.setOpaque(false);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(UIConstants.PADDING_SMALL, 0, UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        addField(fieldsPanel, gbc, "DNI:", txtDni, 0, 0);
+        addField(fieldsPanel, gbc, "Nombre:", txtName, 1, 0);
+        addField(fieldsPanel, gbc, "Apellido:", txtSurname, 2, 0);
+        addField(fieldsPanel, gbc, "Teléfono:", txtPhone, 0, 1);
+        addField(fieldsPanel, gbc, "Calle:", txtStreet, 1, 1);
+        addField(fieldsPanel, gbc, "Ciudad:", txtCity, 2, 1);
+        addField(fieldsPanel, gbc, "Veterinaria Preferida:", cmbPreferredVet, 0, 2);
+
+        // Botones
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_SMALL, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(btnSave);
+        buttonPanel.add(btnUpdate);
+        buttonPanel.add(btnDelete);
+        buttonPanel.add(btnClear);
+
+        panel.add(lblTitle, BorderLayout.NORTH);
+        panel.add(fieldsPanel, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void addField(JPanel panel, GridBagConstraints gbc, String label, JComponent field, int row, int col) {
+        gbc.gridx = col * 2;
+        gbc.gridy = row;
+        gbc.weightx = 0;
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(UIConstants.FONT_BODY_BOLD);
+        lbl.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        panel.add(lbl, gbc);
+
+        gbc.gridx = col * 2 + 1;
+        gbc.weightx = 1;
+        field.setPreferredSize(new Dimension(180, 30));
+        field.setFont(UIConstants.FONT_BODY);
+        panel.add(field, gbc);
+    }
+
+    private JTextField createTextField() {
+        JTextField tf = new JTextField();
+        tf.setFont(UIConstants.FONT_BODY);
+        tf.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
+                new EmptyBorder(4, 8, 4, 8)));
+        return tf;
+    }
+
+    private JButton createButton(String text, Color bgColor) {
+        JButton btn = new JButton(text);
+        btn.setFont(UIConstants.FONT_BODY_BOLD);
+        btn.setBackground(bgColor);
+        btn.setForeground(UIConstants.COLOR_WHITE);
+        btn.setBorder(new EmptyBorder(8, 16, 8, 16));
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return btn;
+    }
+
+    private JPanel createTablePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
+                new EmptyBorder(UIConstants.PADDING_MEDIUM, UIConstants.PADDING_MEDIUM,
+                        UIConstants.PADDING_MEDIUM, UIConstants.PADDING_MEDIUM)
+        ));
+
+        JLabel lblTitle = new JLabel("Dueños Registrados");
+        lblTitle.setFont(UIConstants.FONT_SUBTITLE);
+        lblTitle.setForeground(UIConstants.COLOR_CARD_OWNER);
+        lblTitle.setBorder(new EmptyBorder(0, 0, UIConstants.PADDING_MEDIUM, 0));
+
+        JScrollPane scrollPane = new JScrollPane(tblOwners);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+        panel.add(lblTitle, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private void setupTable() {
+        String[] columns = {"DNI", "Nombre", "Apellido", "Teléfono", "Dirección", "Vet Preferida"};
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        tblOwners.setModel(tableModel);
+        tblOwners.setFont(UIConstants.FONT_BODY);
+        tblOwners.setRowHeight(30);
+        tblOwners.setGridColor(UIConstants.COLOR_BORDER);
+        tblOwners.setShowVerticalLines(false);
+        tblOwners.setSelectionBackground(UIConstants.COLOR_CARD_OWNER.brighter());
+
+        JTableHeader header = tblOwners.getTableHeader();
+        header.setFont(UIConstants.FONT_BODY_BOLD);
+        header.setBackground(UIConstants.COLOR_CARD_OWNER);
+        header.setForeground(UIConstants.COLOR_WHITE);
+        header.setPreferredSize(new Dimension(0, 35));
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+        for (int i = 0; i < columns.length; i++) {
+            tblOwners.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
     }
 
     private void configureListeners() {
-        ownerTableManager.getTblOwners().getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && ownerTableManager.getTblOwners().getSelectedRow() != -1) {
-                int selectedRow = ownerTableManager.getTblOwners().getSelectedRow();
-                showOwnerDetails(selectedRow);
+        btnSave.addActionListener(e -> saveOwner());
+        btnUpdate.addActionListener(e -> updateOwner());
+        btnDelete.addActionListener(e -> deleteOwner());
+        btnClear.addActionListener(e -> clearForm());
+
+        tblOwners.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && tblOwners.getSelectedRow() != -1) {
+                int row = tblOwners.getSelectedRow();
+                fillFormFromRow(row);
             }
         });
     }
 
-    public void updateTableData() {
-        ownerTableManager.updateTableData();
-    }
+    private void saveOwner() {
+        try {
+            int dni = Integer.parseInt(txtDni.getText());
+            String name = txtName.getText();
+            String surname = txtSurname.getText();
+            int phone = Integer.parseInt(txtPhone.getText());
+            String street = txtStreet.getText();
+            String city = txtCity.getText();
 
-    public void showOwnerDetails(int row) {
-        int ownerId = (Integer) ownerTableManager.getTblOwners().getValueAt(row, 0);
-        Owner owner = ownerService.getById(ownerId);
-        if (owner != null) {
-            ownerDetailPanel.setOwner(owner);
-            cardLayout.show(cards, "Detalle del Dueño");
-        } else {
-            JOptionPane.showMessageDialog(this, "No se encontró el dueño con ID: " + ownerId, "Error", JOptionPane.ERROR_MESSAGE);
+            if (name.isEmpty() || surname.isEmpty()) {
+                showError("Nombre y Apellido son obligatorios.");
+                return;
+            }
+
+            Owner owner = new Owner(dni, name, surname, phone, street, city);
+            Vet preferredVet = (Vet) cmbPreferredVet.getSelectedItem();
+            if (preferredVet != null) {
+                owner.setPreferredVet(preferredVet);
+            }
+
+            ownerService.add(owner);
+            loadTableData();
+            clearForm();
+        } catch (NumberFormatException ex) {
+            showError("DNI y Teléfono deben ser números válidos.");
         }
     }
 
-    public void showOwnerList() {
-        updateTableData();
-        cardLayout.show(cards, "Lista de Dueños");
+    private void updateOwner() {
+        int selectedRow = tblOwners.getSelectedRow();
+        if (selectedRow == -1) {
+            showError("Seleccioná un dueño de la tabla.");
+            return;
+        }
+
+        try {
+            int dni = (int) tableModel.getValueAt(selectedRow, 0);
+            Owner owner = ownerService.getById(dni);
+            if (owner == null) {
+                showError("Dueño no encontrado.");
+                return;
+            }
+
+            owner.setName(txtName.getText());
+            owner.setSurname(txtSurname.getText());
+            owner.setPhone(Long.parseLong(txtPhone.getText()));
+            owner.getAddress().setStreet(txtStreet.getText());
+            owner.getAddress().setCity(txtCity.getText());
+
+            Vet preferredVet = (Vet) cmbPreferredVet.getSelectedItem();
+            owner.setPreferredVet(preferredVet);
+
+            ownerService.update(owner);
+            loadTableData();
+            clearForm();
+            info("Dueño actualizado exitosamente.");
+        } catch (NumberFormatException ex) {
+            showError("Teléfono debe ser un número válido.");
+        }
     }
 
-    private JPanel createNavigationPanel() {
-        JPanel navigationPanel = new JPanel(new FlowLayout());
+    private void deleteOwner() {
+        int selectedRow = tblOwners.getSelectedRow();
+        if (selectedRow == -1) {
+            showError("Seleccioná un dueño de la tabla.");
+            return;
+        }
 
-        JButton btnAddOwner = new JButton("Agregar Dueño");
-        JButton btnViewOwners = new JButton("Ver Lista de Dueños");
+        int confirm = JOptionPane.showConfirmDialog(this, UIConstants.MSG_CONFIRM_DELETE,
+                "Confirmar", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) return;
 
-        btnAddOwner.addActionListener(e -> cardLayout.show(cards, "Agregar Dueño"));
-        btnViewOwners.addActionListener(e -> showOwnerList());
+        int dni = (int) tableModel.getValueAt(selectedRow, 0);
+        ownerService.deleteById(dni);
+        loadTableData();
+        clearForm();
+        info("Dueño eliminado exitosamente.");
+    }
 
-        navigationPanel.add(btnAddOwner);
-        navigationPanel.add(btnViewOwners);
+    private void clearForm() {
+        txtDni.setText("");
+        txtName.setText("");
+        txtSurname.setText("");
+        txtPhone.setText("");
+        txtStreet.setText("");
+        txtCity.setText("");
+        cmbPreferredVet.setSelectedIndex(-1);
+        txtDni.setEditable(true);
+        btnSave.setEnabled(true);
+        tblOwners.clearSelection();
+    }
 
-        return navigationPanel;
+    private void fillFormFromRow(int row) {
+        txtDni.setText(String.valueOf(tableModel.getValueAt(row, 0)));
+        txtName.setText((String) tableModel.getValueAt(row, 1));
+        txtSurname.setText((String) tableModel.getValueAt(row, 2));
+        txtPhone.setText(String.valueOf(tableModel.getValueAt(row, 3)));
+        String[] direccion = ((String) tableModel.getValueAt(row, 4)).split(",");
+        txtStreet.setText(direccion[0].trim());
+        txtCity.setText(direccion.length > 1 ? direccion[1].trim() : "");
+        txtDni.setEditable(false);
+        btnSave.setEnabled(false);
+    }
+
+    private void loadTableData() {
+        tableModel.setRowCount(0);
+        List<Owner> owners = ownerService.getAll();
+        for (Owner owner : owners) {
+            String direccion = owner.getAddress().getStreet() + ", " + owner.getAddress().getCity();
+            String vetName = owner.getPreferredVet() != null ? owner.getPreferredVet().getName() : "—";
+            tableModel.addRow(new Object[]{
+                    owner.getDni(), owner.getName(), owner.getSurname(),
+                    owner.getPhone(), direccion, vetName
+            });
+        }
+        loadVets();
+    }
+
+    private void loadVets() {
+        cmbPreferredVet.removeAllItems();
+        List<Vet> vets = vetService.getAll();
+        cmbPreferredVet.addItem(null);
+        for (Vet vet : vets) {
+            cmbPreferredVet.addItem(vet);
+        }
+    }
+
+    /**
+     * Actualiza los datos de la tabla (compatibilidad con OwnerDetailPanel).
+     */
+    public void updateTableData() {
+        loadTableData();
+    }
+
+    /**
+     * Muestra la lista de dueños (compatibilidad con OwnerDetailPanel).
+     */
+    public void showOwnerList() {
+        loadTableData();
+    }
+
+    /**
+     * Retorna la tabla para que OwnerDetailPanel pueda acceder.
+     */
+    public JTable getTblOwners() {
+        return tblOwners;
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void info(String message) {
+        JOptionPane.showMessageDialog(this, message, "Información", JOptionPane.INFORMATION_MESSAGE);
     }
 }
