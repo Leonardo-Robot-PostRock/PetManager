@@ -432,7 +432,7 @@ public class PetDetailPanel extends BasePanel {
         } else {
             StringBuilder sb = new StringBuilder("<html>");
             for (Owner o : owners) {
-                String prefix = o.getSex() == Sex.FEMENINO ? "Mamá" : "Papá";
+                String prefix = o.getSex() == Sex.FEMENINO ? "Dueña" : "Dueño";
                 sb.append(prefix).append(": ").append(o.getName()).append(" ").append(o.getSurname()).append("<br>");
             }
             sb.append("</html>");
