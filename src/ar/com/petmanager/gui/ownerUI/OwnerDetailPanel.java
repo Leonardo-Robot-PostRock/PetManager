@@ -98,11 +98,13 @@ public class OwnerDetailPanel extends BasePanel {
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
         wrapper.setOpaque(false);
+        wrapper.setMaximumSize(new Dimension(380, Integer.MAX_VALUE));
 
         // Card: info del dueño
         JPanel ownerCard = new JPanel();
         ownerCard.setLayout(new BoxLayout(ownerCard, BoxLayout.Y_AXIS));
-        ownerCard.setOpaque(false);
+        ownerCard.setBackground(UIConstants.COLOR_WHITE);
+        ownerCard.setMaximumSize(new Dimension(380, 350));
         ownerCard.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(UIConstants.COLOR_BORDER, 1, true),
                 new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
@@ -135,7 +137,8 @@ public class OwnerDetailPanel extends BasePanel {
     private JPanel createPetsCard() {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setOpaque(false);
+        card.setBackground(UIConstants.COLOR_WHITE);
+        card.setMaximumSize(new Dimension(380, 220));
         card.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(UIConstants.COLOR_BORDER, 1, true),
                 new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
@@ -161,7 +164,7 @@ public class OwnerDetailPanel extends BasePanel {
         namesRow.add(lblNames);
 
         JScrollPane scrollNames = new JScrollPane(txtPetNames);
-        scrollNames.setPreferredSize(new Dimension(300, 60));
+        scrollNames.setPreferredSize(new Dimension(300, 50));
         scrollNames.setBorder(new LineBorder(UIConstants.COLOR_BORDER, 1));
 
         card.add(namesRow);
