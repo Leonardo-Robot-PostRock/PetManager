@@ -119,8 +119,11 @@ public class OwnerDetailPanel extends BasePanel {
         // Sección mascotas
         JLabel lblPets = new JLabel("Mascotas");
         lblPets.setFont(UIConstants.FONT_BODY_BOLD);
-        lblPets.setForeground(UIConstants.COLOR_CARD_PETS);
-        panel.add(lblPets);
+        lblPets.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        JPanel petsHeaderRow = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
+        petsHeaderRow.setOpaque(false);
+        petsHeaderRow.add(lblPets);
+        panel.add(petsHeaderRow);
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
         panel.add(createInfoRow("Cantidad:", lblPetCount));
         panel.add(createInfoRow("Tipos:", lblPetTypes));
@@ -128,12 +131,15 @@ public class OwnerDetailPanel extends BasePanel {
         JLabel lblNames = new JLabel("Nombres:");
         lblNames.setFont(UIConstants.FONT_BODY_BOLD);
         lblNames.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
+        JPanel namesHeaderRow = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
+        namesHeaderRow.setOpaque(false);
+        namesHeaderRow.add(lblNames);
 
         JScrollPane scrollNames = new JScrollPane(txtPetNames);
         scrollNames.setPreferredSize(new Dimension(300, 60));
         scrollNames.setBorder(new LineBorder(UIConstants.COLOR_BORDER, 1));
 
-        panel.add(lblNames);
+        panel.add(namesHeaderRow);
         panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
         panel.add(scrollNames);
 
