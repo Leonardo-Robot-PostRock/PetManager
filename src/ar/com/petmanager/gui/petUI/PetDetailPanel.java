@@ -148,6 +148,7 @@ public class PetDetailPanel extends BasePanel {
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
         wrapper.setOpaque(false);
+        wrapper.setMaximumSize(new Dimension(380, Integer.MAX_VALUE));
 
         // Card: info principal
         JPanel infoCard = createBorderedCard();
@@ -189,6 +190,7 @@ public class PetDetailPanel extends BasePanel {
         JPanel descCard = createBorderedCard();
         descCard.setLayout(new BorderLayout(0, UIConstants.PADDING_SMALL));
         descCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        descCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
         JLabel lblDesc = new JLabel("Descripción:");
         lblDesc.setFont(UIConstants.FONT_BODY_BOLD);
