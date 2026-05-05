@@ -95,10 +95,15 @@ public class OwnerDetailPanel extends BasePanel {
     }
 
     private JPanel createInfoSection() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setOpaque(false);
-        panel.setBorder(BorderFactory.createCompoundBorder(
+        JPanel wrapper = new JPanel();
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
+        wrapper.setOpaque(false);
+
+        // Card: info del dueño
+        JPanel ownerCard = new JPanel();
+        ownerCard.setLayout(new BoxLayout(ownerCard, BoxLayout.Y_AXIS));
+        ownerCard.setOpaque(false);
+        ownerCard.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(UIConstants.COLOR_BORDER, 1, true),
                 new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
                         UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE)
@@ -107,43 +112,63 @@ public class OwnerDetailPanel extends BasePanel {
         lblName.setFont(UIConstants.FONT_TITLE);
         lblName.setForeground(UIConstants.COLOR_CARD_OWNER);
 
-        panel.add(lblName);
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
-        panel.add(createInfoRow("DNI:", lblDni));
-        panel.add(createInfoRow("Teléfono:", lblPhone));
-        panel.add(createInfoRow("Dirección:", lblAddress));
-        panel.add(createInfoRow("Sexo:", lblSex));
-        panel.add(createInfoRow("Vet. Preferida:", lblVet));
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
+        JPanel nameRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        nameRow.setOpaque(false);
+        nameRow.add(lblName);
+        ownerCard.add(nameRow);
+        ownerCard.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
+        ownerCard.add(createInfoRow("DNI:", lblDni));
+        ownerCard.add(createInfoRow("Teléfono:", lblPhone));
+        ownerCard.add(createInfoRow("Dirección:", lblAddress));
+        ownerCard.add(createInfoRow("Sexo:", lblSex));
+        ownerCard.add(createInfoRow("Vet. Preferida:", lblVet));
 
-        // Sección mascotas
+        wrapper.add(ownerCard);
+        wrapper.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
+
+        // Card: mascotas
+        wrapper.add(createPetsCard());
+
+        return wrapper;
+    }
+
+    private JPanel createPetsCard() {
+        JPanel card = new JPanel();
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setOpaque(false);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
+                new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
+                        UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE)
+        ));
+
         JLabel lblPets = new JLabel("Mascotas");
-        lblPets.setFont(UIConstants.FONT_BODY_BOLD);
-        lblPets.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
-        JPanel petsHeaderRow = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
-        petsHeaderRow.setOpaque(false);
-        petsHeaderRow.add(lblPets);
-        panel.add(petsHeaderRow);
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
-        panel.add(createInfoRow("Cantidad:", lblPetCount));
-        panel.add(createInfoRow("Tipos:", lblPetTypes));
+        lblPets.setFont(UIConstants.FONT_SUBTITLE);
+        lblPets.setForeground(UIConstants.COLOR_CARD_OWNER);
+        JPanel headerRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        headerRow.setOpaque(false);
+        headerRow.add(lblPets);
+        card.add(headerRow);
+        card.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
+        card.add(createInfoRow("Cantidad:", lblPetCount));
+        card.add(createInfoRow("Tipos:", lblPetTypes));
 
         JLabel lblNames = new JLabel("Nombres:");
         lblNames.setFont(UIConstants.FONT_BODY_BOLD);
         lblNames.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
-        JPanel namesHeaderRow = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
-        namesHeaderRow.setOpaque(false);
-        namesHeaderRow.add(lblNames);
+        JPanel namesRow = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
+        namesRow.setOpaque(false);
+        namesRow.add(lblNames);
 
         JScrollPane scrollNames = new JScrollPane(txtPetNames);
         scrollNames.setPreferredSize(new Dimension(300, 60));
         scrollNames.setBorder(new LineBorder(UIConstants.COLOR_BORDER, 1));
 
-        panel.add(namesHeaderRow);
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
-        panel.add(scrollNames);
+        card.add(namesRow);
+        card.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_SMALL)));
+        card.add(scrollNames);
 
-        return panel;
+        return card;
     }
 
     private JPanel createInfoRow(String label, JLabel value) {
