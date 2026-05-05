@@ -82,7 +82,7 @@ public class PetUI extends BasePanel {
         tblPets.setRowHeight(35);
         tblPets.setGridColor(UIConstants.COLOR_BORDER);
         tblPets.setShowVerticalLines(false);
-        tblPets.setSelectionBackground(UIConstants.COLOR_CARD_PETS.brighter());
+        tblPets.setSelectionBackground(new Color(100, 180, 220, 60));
 
         JTableHeader header = tblPets.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);
@@ -135,6 +135,7 @@ public class PetUI extends BasePanel {
         // Barra de acciones
         JPanel actionBar = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
         actionBar.setOpaque(false);
+        actionBar.setBorder(new EmptyBorder(0, 0, UIConstants.PADDING_SMALL, 0));
 
         JButton btnViewDetail = createButton("Ver Detalle", UIConstants.COLOR_ACCENT);
         JButton btnDelete = createButton("Eliminar", UIConstants.COLOR_ERROR);

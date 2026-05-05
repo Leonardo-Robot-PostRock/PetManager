@@ -228,7 +228,7 @@ public class OwnerUI extends BasePanel {
         tblOwners.setRowHeight(30);
         tblOwners.setGridColor(UIConstants.COLOR_BORDER);
         tblOwners.setShowVerticalLines(false);
-        tblOwners.setSelectionBackground(UIConstants.COLOR_CARD_OWNER.brighter());
+        tblOwners.setSelectionBackground(new Color(160, 120, 220, 60));
 
         JTableHeader header = tblOwners.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);

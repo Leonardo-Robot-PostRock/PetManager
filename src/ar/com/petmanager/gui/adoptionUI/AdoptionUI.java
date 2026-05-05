@@ -96,22 +96,26 @@ public class AdoptionUI extends BasePanel {
 
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Footer con selector de dueño y botón adoptar
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, UIConstants.PADDING_LARGE, 0));
-        footerPanel.setOpaque(false);
-        footerPanel.setBorder(new EmptyBorder(UIConstants.PADDING_LARGE, 0, 0, 0));
+        // Footer con selector de dueño y botón adoptar en card
+        JPanel adoptionCard = new JPanel(new FlowLayout(FlowLayout.CENTER, UIConstants.PADDING_LARGE, 0));
+        adoptionCard.setBackground(UIConstants.COLOR_WHITE);
+        adoptionCard.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_CARD_PETS, 1, true),
+                new EmptyBorder(UIConstants.PADDING_MEDIUM, UIConstants.PADDING_MEDIUM,
+                        UIConstants.PADDING_MEDIUM, UIConstants.PADDING_MEDIUM)
+        ));
 
         JLabel lblSelectOwner = new JLabel("Seleccioná dueño:");
         lblSelectOwner.setFont(UIConstants.FONT_BODY_BOLD);
         lblSelectOwner.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
 
-        footerPanel.add(lblSelectOwner);
-        footerPanel.add(cmbOwners);
-        footerPanel.add(btnAdopt);
+        adoptionCard.add(lblSelectOwner);
+        adoptionCard.add(cmbOwners);
+        adoptionCard.add(btnAdopt);
 
         add(headerPanel, BorderLayout.NORTH);
         add(tablePanel, BorderLayout.CENTER);
-        add(footerPanel, BorderLayout.SOUTH);
+        add(adoptionCard, BorderLayout.SOUTH);
     }
 
     private void setupTable() {
@@ -127,7 +131,7 @@ public class AdoptionUI extends BasePanel {
         tblAvailablePets.setRowHeight(35);
         tblAvailablePets.setGridColor(UIConstants.COLOR_BORDER);
         tblAvailablePets.setShowVerticalLines(false);
-        tblAvailablePets.setSelectionBackground(UIConstants.COLOR_CARD_PETS.brighter());
+        tblAvailablePets.setSelectionBackground(new Color(100, 180, 220, 60));
 
         JTableHeader header = tblAvailablePets.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);

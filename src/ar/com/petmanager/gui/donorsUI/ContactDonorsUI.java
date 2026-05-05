@@ -96,6 +96,7 @@ public class ContactDonorsUI extends BasePanel {
 
         JPanel actionBar = new JPanel(new FlowLayout(FlowLayout.LEFT, UIConstants.PADDING_MEDIUM, 0));
         actionBar.setOpaque(false);
+        actionBar.setBorder(new EmptyBorder(0, 0, UIConstants.PADDING_SMALL, 0));
         actionBar.add(btnAdd);
         actionBar.add(btnDelete);
 
@@ -136,7 +137,7 @@ public class ContactDonorsUI extends BasePanel {
         tblDonors.setRowHeight(35);
         tblDonors.setGridColor(UIConstants.COLOR_BORDER);
         tblDonors.setShowVerticalLines(false);
-        tblDonors.setSelectionBackground(UIConstants.COLOR_CARD_DONORS.brighter());
+        tblDonors.setSelectionBackground(new Color(80, 170, 130, 60));
 
         JTableHeader header = tblDonors.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);

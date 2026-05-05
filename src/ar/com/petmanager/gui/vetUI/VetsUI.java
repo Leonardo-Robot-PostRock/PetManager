@@ -168,7 +168,7 @@ public class VetsUI extends BasePanel {
         tblVets.setRowHeight(30);
         tblVets.setGridColor(UIConstants.COLOR_BORDER);
         tblVets.setShowVerticalLines(false);
-        tblVets.setSelectionBackground(UIConstants.COLOR_CARD_VETS.brighter());
+        tblVets.setSelectionBackground(new Color(220, 160, 120, 60));
 
         JTableHeader header = tblVets.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);
