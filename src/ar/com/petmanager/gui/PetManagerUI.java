@@ -142,7 +142,7 @@ public class PetManagerUI extends JFrame {
         lblActiveSection.setForeground(Color.WHITE);
 
         header.add(lblLogo, BorderLayout.WEST);
-        header.add(lblActiveSection, BorderLayout.CENTER);
+        header.add(lblActiveSection, BorderLayout.EAST);
 
         return header;
     }
