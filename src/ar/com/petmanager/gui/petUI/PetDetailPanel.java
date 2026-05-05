@@ -145,71 +145,76 @@ public class PetDetailPanel extends BasePanel {
     }
 
     private JPanel createInfoSection() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setOpaque(false);
-        panel.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
-                new EmptyBorder(UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE,
-                        UIConstants.PADDING_LARGE, UIConstants.PADDING_LARGE)
-        ));
+        JPanel wrapper = new JPanel();
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
+        wrapper.setOpaque(false);
 
+        // Card: info principal
+        JPanel infoCard = createBorderedCard();
+        infoCard.setLayout(new BoxLayout(infoCard, BoxLayout.Y_AXIS));
+        infoCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JPanel nameRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        nameRow.setOpaque(false);
         lblName.setFont(UIConstants.FONT_TITLE);
         lblName.setForeground(UIConstants.COLOR_CARD_PETS);
+        nameRow.add(lblName);
+        infoCard.add(nameRow);
+        infoCard.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
+        infoCard.add(createInfoRow("Tipo:", lblType));
+        infoCard.add(createTextFieldRow("Edad:", txtAge));
+        infoCard.add(createTextFieldRow("Peso:", txtWeight));
+        infoCard.add(createInfoRow("Raza:", lblRace));
+        infoCard.add(createCheckRow("Condición:", chkSick));
+        infoCard.add(createComboRow("Estatus:", cmbStatus));
 
-        panel.add(lblName);
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_LARGE)));
-        panel.add(createInfoRow("Tipo:", lblType));
-        panel.add(createTextFieldRow("Edad:", txtAge));
-        panel.add(createTextFieldRow("Peso:", txtWeight));
-        panel.add(createInfoRow("Raza:", lblRace));
-        panel.add(createCheckRow("Condición:", chkSick));
-        panel.add(createComboRow("Estatus:", cmbStatus));
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
+        wrapper.add(infoCard);
+        wrapper.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
 
         // Card: Dueños
-        JPanel ownersCard = new JPanel();
+        JPanel ownersCard = createBorderedCard();
         ownersCard.setLayout(new BoxLayout(ownersCard, BoxLayout.Y_AXIS));
-        ownersCard.setBackground(UIConstants.COLOR_WHITE);
-        ownersCard.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
-                new EmptyBorder(UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM,
-                        UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM)
-        ));
+        ownersCard.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblOwnerTitle = new JLabel("Dueños:");
         lblOwnerTitle.setFont(UIConstants.FONT_BODY_BOLD);
         lblOwnerTitle.setForeground(UIConstants.COLOR_CARD_PETS);
-        lblOwners.setForeground(UIConstants.COLOR_TEXT_PRIMARY);
         ownersCard.add(lblOwnerTitle);
         ownersCard.add(lblOwners);
 
-        panel.add(ownersCard);
-        panel.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
+        wrapper.add(ownersCard);
+        wrapper.add(Box.createRigidArea(new Dimension(0, UIConstants.PADDING_MEDIUM)));
 
         // Card: Descripción
-        JPanel descCard = new JPanel(new BorderLayout(0, UIConstants.PADDING_SMALL));
-        descCard.setBackground(UIConstants.COLOR_WHITE);
-        descCard.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
-                new EmptyBorder(UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM,
-                        UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM)
-        ));
+        JPanel descCard = createBorderedCard();
+        descCard.setLayout(new BorderLayout(0, UIConstants.PADDING_SMALL));
+        descCard.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel lblDesc = new JLabel("Descripción:");
         lblDesc.setFont(UIConstants.FONT_BODY_BOLD);
         lblDesc.setForeground(UIConstants.COLOR_CARD_PETS);
 
         JScrollPane scrollDesc = new JScrollPane(txtDescription);
-        scrollDesc.setPreferredSize(new Dimension(300, 60));
+        scrollDesc.setPreferredSize(new Dimension(300, 50));
         scrollDesc.setBorder(BorderFactory.createEmptyBorder());
 
         descCard.add(lblDesc, BorderLayout.NORTH);
         descCard.add(scrollDesc, BorderLayout.CENTER);
 
-        panel.add(descCard);
+        wrapper.add(descCard);
 
-        return panel;
+        return wrapper;
+    }
+
+    private JPanel createBorderedCard() {
+        JPanel card = new JPanel();
+        card.setBackground(UIConstants.COLOR_WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_BORDER, 1, true),
+                new EmptyBorder(UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM,
+                        UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM)
+        ));
+        return card;
     }
 
     private JPanel createInfoRow(String label, JLabel value) {
