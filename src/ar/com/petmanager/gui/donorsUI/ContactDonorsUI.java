@@ -137,7 +137,7 @@ public class ContactDonorsUI extends BasePanel {
         tblDonors.setRowHeight(35);
         tblDonors.setGridColor(UIConstants.COLOR_BORDER);
         tblDonors.setShowVerticalLines(false);
-        tblDonors.setSelectionBackground(new Color(80, 170, 130, 60));
+        tblDonors.setSelectionBackground(UIConstants.COLOR_CARD_DONORS.darker());
 
         JTableHeader header = tblDonors.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);

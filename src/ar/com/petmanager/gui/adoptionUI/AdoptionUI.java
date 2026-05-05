@@ -131,7 +131,7 @@ public class AdoptionUI extends BasePanel {
         tblAvailablePets.setRowHeight(35);
         tblAvailablePets.setGridColor(UIConstants.COLOR_BORDER);
         tblAvailablePets.setShowVerticalLines(false);
-        tblAvailablePets.setSelectionBackground(new Color(100, 180, 220, 60));
+        tblAvailablePets.setSelectionBackground(UIConstants.COLOR_CARD_PETS.darker());
 
         JTableHeader header = tblAvailablePets.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);

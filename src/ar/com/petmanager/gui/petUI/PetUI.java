@@ -82,7 +82,7 @@ public class PetUI extends BasePanel {
         tblPets.setRowHeight(35);
         tblPets.setGridColor(UIConstants.COLOR_BORDER);
         tblPets.setShowVerticalLines(false);
-        tblPets.setSelectionBackground(new Color(100, 180, 220, 60));
+        tblPets.setSelectionBackground(UIConstants.COLOR_CARD_PETS.darker());
 
         JTableHeader header = tblPets.getTableHeader();
         header.setFont(UIConstants.FONT_BODY_BOLD);
