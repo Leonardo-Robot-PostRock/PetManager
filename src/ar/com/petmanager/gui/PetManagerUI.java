@@ -22,7 +22,9 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Main frame de PetManager.
@@ -42,7 +44,8 @@ public class PetManagerUI extends JFrame {
     private AdoptionUI adoptionPanel;
 
     private JLabel lblActiveSection;
-    private JButton btnActive;
+    private final Map<String, JButton> sidebarButtons = new HashMap<>();
+    private String currentPanelName = "inicio";
 
     // Servicios
     private final OwnerServiceImpl ownerService;
@@ -182,8 +185,8 @@ public class PetManagerUI extends JFrame {
     private JButton createSidebarButton(String label, String panelName, boolean isActive) {
         JButton btn = new JButton(label);
         btn.setFont(UIConstants.FONT_BODY);
-        btn.setForeground(isActive ? UIConstants.COLOR_PRIMARY:UIConstants.COLOR_TEXT_SECONDARY);
-        btn.setBackground(isActive ? UIConstants.COLOR_PRIMARY.brighter().brighter():Color.WHITE);
+        btn.setForeground(isActive ? UIConstants.COLOR_PRIMARY : UIConstants.COLOR_TEXT_SECONDARY);
+        btn.setBackground(isActive ? UIConstants.COLOR_PRIMARY.brighter().brighter() : Color.WHITE);
         btn.setBorder(new EmptyBorder(12, UIConstants.PADDING_LARGE, 12, UIConstants.PADDING_LARGE));
         btn.setFocusPainted(false);
         btn.setOpaque(true);
@@ -193,17 +196,19 @@ public class PetManagerUI extends JFrame {
         btn.setMaximumSize(new Dimension(UIConstants.SIDEBAR_WIDTH - 20, 45));
         btn.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+        sidebarButtons.put(panelName, btn);
+
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (btn!=btnActive) {
+                if (!isActiveButton(panelName)) {
                     btn.setBackground(UIConstants.COLOR_BORDER);
                 }
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                if (btn!=btnActive) {
+                if (!isActiveButton(panelName)) {
                     btn.setBackground(Color.WHITE);
                 }
             }
@@ -211,16 +216,27 @@ public class PetManagerUI extends JFrame {
 
         btn.addActionListener(e -> navigateTo(panelName));
 
-        if (isActive) {
-            btnActive = btn;
-        }
-
         return btn;
     }
 
+    private void setActiveSidebarButton(String panelName) {
+        for (Map.Entry<String, JButton> entry : sidebarButtons.entrySet()) {
+            JButton btn = entry.getValue();
+            boolean active = entry.getKey().equals(panelName);
+            btn.setForeground(active ? UIConstants.COLOR_PRIMARY : UIConstants.COLOR_TEXT_SECONDARY);
+            btn.setBackground(active ? UIConstants.COLOR_PRIMARY.brighter().brighter() : Color.WHITE);
+        }
+    }
+
+    private boolean isActiveButton(String panelName) {
+        return panelName.equals(currentPanelName);
+    }
+
     private void navigateTo(String panelName) {
+        currentPanelName = panelName;
         cardLayout.show(contentPanel, panelName);
         lblActiveSection.setText(capitalizeSectionName(panelName));
+        setActiveSidebarButton(panelName);
 
         // Refresh de datos
         switch (panelName) {
