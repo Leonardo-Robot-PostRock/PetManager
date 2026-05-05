@@ -154,6 +154,7 @@ public class PetDetailPanel extends BasePanel {
         JPanel infoCard = createBorderedCard();
         infoCard.setLayout(new BoxLayout(infoCard, BoxLayout.Y_AXIS));
         infoCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        infoCard.setMaximumSize(new Dimension(380, 320));
 
         JPanel nameRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         nameRow.setOpaque(false);
@@ -176,6 +177,7 @@ public class PetDetailPanel extends BasePanel {
         JPanel ownersCard = createBorderedCard();
         ownersCard.setLayout(new BoxLayout(ownersCard, BoxLayout.Y_AXIS));
         ownersCard.setAlignmentX(Component.LEFT_ALIGNMENT);
+        ownersCard.setMaximumSize(new Dimension(380, 120));
 
         JLabel lblOwnerTitle = new JLabel("Dueños:");
         lblOwnerTitle.setFont(UIConstants.FONT_BODY_BOLD);
@@ -190,7 +192,7 @@ public class PetDetailPanel extends BasePanel {
         JPanel descCard = createBorderedCard();
         descCard.setLayout(new BorderLayout(0, UIConstants.PADDING_SMALL));
         descCard.setAlignmentX(Component.LEFT_ALIGNMENT);
-        descCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+        descCard.setMaximumSize(new Dimension(380, 100));
 
         JLabel lblDesc = new JLabel("Descripción:");
         lblDesc.setFont(UIConstants.FONT_BODY_BOLD);
