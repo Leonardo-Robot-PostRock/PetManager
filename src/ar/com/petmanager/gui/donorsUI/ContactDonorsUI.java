@@ -107,15 +107,20 @@ public class ContactDonorsUI extends BasePanel {
         tablePanel.add(actionBar,  BorderLayout.NORTH);
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Footer con total
-        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        footerPanel.setOpaque(false);
-        footerPanel.add(lblTotal);
-        footerPanel.setBorder(new EmptyBorder(UIConstants.PADDING_MEDIUM, 0, 0, 0));
+        // Footer con total en card
+        JPanel totalCard = new JPanel(new BorderLayout());
+        totalCard.setBackground(UIConstants.COLOR_WHITE);
+        totalCard.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(UIConstants.COLOR_CARD_DONORS, 1, true),
+                new EmptyBorder(UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM,
+                        UIConstants.PADDING_SMALL, UIConstants.PADDING_MEDIUM)
+        ));
+        totalCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        totalCard.add(lblTotal, BorderLayout.CENTER);
 
         add(headerPanel, BorderLayout.NORTH);
         add(tablePanel,  BorderLayout.CENTER);
-        add(footerPanel, BorderLayout.SOUTH);
+        add(totalCard,   BorderLayout.SOUTH);
     }
 
     private void setupTable() {

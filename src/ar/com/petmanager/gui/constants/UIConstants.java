@@ -22,7 +22,7 @@ public final class UIConstants {
     public static final Color COLOR_TEXT_PRIMARY = new Color(60, 60, 60);
     public static final Color COLOR_TEXT_SECONDARY = new Color(140, 140, 140);
     public static final Color COLOR_BORDER = new Color(220, 220, 220);
-    public static final Color COLOR_SUCCESS = new Color(100, 200, 120);
+    public static final Color COLOR_SUCCESS = new Color(34, 139, 34);   // verde oscuro
     public static final Color COLOR_WARNING = new Color(240, 200, 80);
     public static final Color COLOR_ERROR = new Color(220, 100, 100);
     public static final Color COLOR_WHITE = Color.WHITE;
@@ -32,7 +32,7 @@ public final class UIConstants {
     public static final Color COLOR_CARD_OWNER = new Color(160, 120, 220);
     public static final Color COLOR_CARD_PETS = new Color(100, 180, 220);
     public static final Color COLOR_CARD_VETS = new Color(220, 160, 120);
-    public static final Color COLOR_CARD_DONORS = new Color(120, 200, 160);
+    public static final Color COLOR_CARD_DONORS = new Color(80, 170, 130);
 
     // -- Dimensiones de la ventana principal --
     public static final int WINDOW_WIDTH = 1000;
