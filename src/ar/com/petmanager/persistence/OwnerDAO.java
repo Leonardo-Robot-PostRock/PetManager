@@ -164,6 +164,7 @@ public class OwnerDAO implements DAO<Owner, Integer> {
             pet = new ar.com.petmanager.domain.Cat(rs.getString("name"), rs.getString("age"), rs.getDouble("weight"), rs.getString("race"),
                     rs.getBoolean("is_sick"), rs.getString("description"));
         }
+        pet.setId(rs.getLong("id"));
         try {
             pet.setStatus(ar.com.petmanager.domain.PetStatus.valueOf(rs.getString("status")));
         } catch (IllegalArgumentException | SQLException e) {
