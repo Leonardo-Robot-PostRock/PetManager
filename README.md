@@ -17,18 +17,19 @@ Permite administrar dueños, mascotas, veterinarias y donantes, con persistencia
 | Herencia | `Person` → `Owner`, `Donor` | Abstract class |
 | Herencia | `Pet` → `Dog`, `Cat` | Abstract class |
 | Agregación | `Owner` ↔ `Pet` | Bidireccional (muchos-a-muchos) |
+| Asociación | `Owner` → `Vet` | Unidireccional (muchos-a-uno, preferred_vet) |
 | Composición | `Person` → `Address` | Unidireccional |
 | Composición | `Vet` → `Address` | Unidireccional |
 | Polimorfismo | `Pet`, `Person` | Métodos sobrescritos en subclases |
 
 ## Funcionalidades
 
-- **Dashboard** — Estadísticas generales (total mascotas, perros, gatos, perdidas, fallecidas)
-- **Dueños** — ABM de dueños con asignación de veterinaria preferida
-- **Mascotas** — Listado con filtros (Todos/Perros/Gatos), detalle con foto, estado (Activa/Perdida/Fallecida)
-- **Veterinarias** — Registro de clínicas veterinarias
-- **Donantes** — Listado de contactos donantes
-- **Adopciones** — Panel para adoptar mascotas disponibles
+- **Dashboard** — Estadísticas (total mascotas, perros, gatos, dueños, veterinarias, perdidas, fallecidas, en adopción)
+- **Dueños** — ABM con sexo (Masculino/Femenino), veterinaria preferida y detalle con resumen de mascotas
+- **Mascotas** — ABM con filtros, detalle editable (edad, peso, salud, estado), asignación de dueño, dar en adopción
+- **Veterinarias** — ABM de clínicas veterinarias
+- **Donantes** — ABM de contactos donantes con búsqueda
+- **Adopciones** — Panel para adoptar mascotas sin dueño, con selector de dueño en card
 
 ## Configurar la base de datos
 
@@ -41,11 +42,10 @@ mysql -u root -p < resources/schema.sql
 ```
 
 Esto crea la base `petmanager` con todas las tablas:
-- `persons` — Dueños y Donantes (discriminador `type`)
-- `pets` — Mascotas con estado (`ACTIVA`/`PERDIDA`/`FALLECIDA`)
+- `persons` — Dueños y Donantes con discriminador `type`, sexo (`MASCULINO`/`FEMENINO`) y `preferred_vet_id` (FK a `vets`)
+- `pets` — Mascotas con edad textual (`VARCHAR`), peso decimal y estado (`ACTIVA`/`PERDIDA`/`FALLECIDA`)
 - `vets` — Veterinarias
 - `owner_pet` — Relación muchos-a-muchos Owner↔Pet
-- `owner_vet` — Relación Owner↔Vet con flag `is_preferred`
 
 3. Configurá tus credenciales:
 
@@ -92,7 +92,7 @@ PetManager/
 │   └── schema.sql               # DDL para MySQL
 ├── src/ar/com/petmanager/
 │   ├── assets/images/           # Imágenes de UI y background
-│   ├── domain/                  # Entidades (Owner, Pet, Vet, Donor, Address)
+│   ├── domain/                  # Entidades (Owner, Pet, Vet, Donor, Address, Sex)
 │   ├── service/                 # Lógica de negocio (CRUD services)
 │   ├── data/                    # DataAccess (fachada JDBC)
 │   ├── persistence/             # DAOs y DBConnector (JDBC)
@@ -118,7 +118,7 @@ PetManager/
 | Perdida | La mascota está extraviada |
 | Fallecida | La mascota ha fallecido |
 
-El estado se puede cambiar desde el panel de detalle de cada mascota.
+El estado, edad, peso y condición de salud se pueden editar desde el botón **Editar** en el panel de detalle.
 
 ## Licencia
 
